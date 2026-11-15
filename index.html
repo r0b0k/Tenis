@@ -224,4 +224,512 @@
         <section id="view-quick" class="hidden max-w-3xl mx-auto space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="px-6 py-5 bg-gradient-to-r from-court-800 to-navy-900 text-white">
-                    <div class="flex items
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-neon text-navy-900 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-bolt text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold">Asistente Rápido de Partido (1 vs 1)</h2>
+                            <p class="text-xs text-slate-200">Registra un encuentro individual: suma automáticamente +1 Victoria al ganador y +1 Derrota al perdedor manteniendo el cuadre perfecto.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form onsubmit="handleQuickMatchSubmit(event)" class="p-6 space-y-5">
+                    <div>
+                        <label for="quick-date" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">1. Selecciona la Jornada / Fecha</label>
+                        <select id="quick-date" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
+                            <!-- Opciones dinámicas -->
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+                            <label for="quick-winner" class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">
+                                <i class="fa-solid fa-trophy text-emerald-600 mr-1"></i> Ganador (+1 Victoria)
+                            </label>
+                            <select id="quick-winner" class="w-full rounded-xl border border-emerald-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                <!-- Opciones dinámicas -->
+                            </select>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200">
+                            <label for="quick-loser" class="block text-xs font-bold uppercase tracking-wider text-rose-800 mb-2">
+                                <i class="fa-solid fa-xmark text-rose-600 mr-1"></i> Perdedor (+1 Derrota)
+                            </label>
+                            <select id="quick-loser" class="w-full rounded-xl border border-rose-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                                <!-- Opciones dinámicas -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+                        <span class="text-xs text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-court-600"></i>
+                            Garantiza cuadre exacto (Dif: 0) en la jornada seleccionada
+                        </span>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-court-700 hover:bg-court-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>Registrar Resultado del Partido</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Historial Reciente de Partidos Rápidos de la Sesión -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-navy-900">Últimos partidos anotados desde el Asistente</h3>
+                    <span id="quick-log-count" class="text-xs font-semibold text-slate-500">0 registros</span>
+                </div>
+                <div id="quick-log-list" class="space-y-2 text-xs text-slate-600">
+                    <p class="text-slate-400 italic py-2">Aún no has registrado partidos individuales en esta sesión.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <p><strong>Liga de Tenis Rotativa (2026)</strong> • Basado exactamente en la lógica de <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">Registro_Tenis_Fines_de_Semana_2026-v3.xlsx</code></p>
+            <p class="flex items-center gap-1.5 text-court-700 font-medium">
+                <i class="fa-solid fa-floppy-disk"></i> Guardado automático activo en navegador
+            </p>
+        </div>
+    </footer>
+
+    <!-- Lógica Completa de la Aplicación -->
+    <script>
+        // =========================================================================
+        // 1. ESTADO INICIAL EXACTAMENTE IGUAL AL ARCHIVO EXCEL (2026)
+        // =========================================================================
+        const STORAGE_KEY = 'liga_tenis_rotativa_2026_v3';
+
+        const DEFAULT_DATES = [
+            'Dom 15-Nov', 'Sáb 21-Nov', 'Dom 22-Nov', 'Sáb 28-Nov', 'Dom 29-Nov',
+            'Sáb 05-Dic', 'Dom 06-Dic', 'Sáb 12-Dic', 'Dom 13-Dic', 'Sáb 19-Dic',
+            'Dom 20-Dic', 'Sáb 26-Dic', 'Dom 27-Dic'
+        ];
+
+        function getInitialState() {
+            const createWinsRow = (firstDay) => [firstDay, ...Array(DEFAULT_DATES.length - 1).fill(0)];
+            const createLossesRow = (firstDay) => [firstDay, ...Array(DEFAULT_DATES.length - 1).fill(0)];
+
+            return {
+                ptsWin: 2,
+                ptsLoss: 1,
+                dates: [...DEFAULT_DATES],
+                players: [
+                    {
+                        id: 'p1',
+                        name: 'Rodrigo',
+                        wins: createWinsRow(3),
+                        losses: createLossesRow(3)
+                    },
+                    {
+                        id: 'p2',
+                        name: 'Gera',
+                        wins: createWinsRow(3),
+                        losses: createLossesRow(3)
+                    },
+                    {
+                        id: 'p3',
+                        name: 'Alexis',
+                        wins: createWinsRow(4),
+                        losses: createLossesRow(2)
+                    }
+                ],
+                quickLogs: []
+            };
+        }
+
+        let state = loadState();
+        let chartInstance = null;
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && Array.isArray(parsed.players) && Array.isArray(parsed.dates)) {
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.error('Error leyendo localStorage:', e);
+            }
+            return getInitialState();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Error guardando en localStorage:', e);
+            }
+        }
+
+        // =========================================================================
+        // 2. MOTOR DE CÁLCULO (FÓRMULAS EXACTAS DEL EXCEL)
+        // =========================================================================
+        function computeLeagueStats() {
+            const ptsWin = Number(state.ptsWin) || 0;
+            const ptsLoss = Number(state.ptsLoss) || 0;
+
+            const playerStats = state.players.map((player, initialIdx) => {
+                const totalWins = player.wins.reduce((acc, v) => acc + (Number(v) || 0), 0);
+                const totalLosses = player.losses.reduce((acc, v) => acc + (Number(v) || 0), 0);
+                const pj = totalWins + totalLosses;
+                const totalPoints = (totalWins * ptsWin) + (totalLosses * ptsLoss);
+
+                const winPct = pj > 0 ? (totalWins / pj) * 100 : 0;
+                const maxPossiblePts = pj * ptsWin;
+                const effPct = maxPossiblePts > 0 ? (totalPoints / maxPossiblePts) * 100 : 0;
+
+                const orderTieBreaker = (state.players.length - initialIdx) * 0.00001;
+                const tieBreakerIndex = totalPoints + (totalWins * 0.001) + orderTieBreaker;
+
+                return {
+                    ...player,
+                    initialIdx,
+                    totalWins,
+                    totalLosses,
+                    pj,
+                    totalPoints,
+                    winPct,
+                    effPct,
+                    tieBreakerIndex
+                };
+            });
+
+            const rankedPlayers = [...playerStats].sort((a, b) => b.tieBreakerIndex - a.tieBreakerIndex);
+
+            const globalWins = playerStats.reduce((acc, p) => acc + p.totalWins, 0);
+            const globalLosses = playerStats.reduce((acc, p) => acc + p.totalLosses, 0);
+            const globalDiff = globalWins - globalLosses;
+
+            return {
+                playerStats,
+                rankedPlayers,
+                globalWins,
+                globalLosses,
+                globalDiff
+            };
+        }
+
+        // =========================================================================
+        // 3. RENDERIZADO DE TODAS LAS VISTAS
+        // =========================================================================
+        function renderAll() {
+            const stats = computeLeagueStats();
+
+            document.getElementById('pts-win-input').value = state.ptsWin;
+            document.getElementById('pts-loss-input').value = state.ptsLoss;
+
+            renderKPIs(stats);
+            renderRankingTable(stats);
+            renderChart(stats);
+            renderQuickMatchForm();
+        }
+
+        function renderKPIs(stats) {
+            const leader = stats.rankedPlayers[0];
+            const bestEff = [...stats.rankedPlayers].sort((a, b) => b.effPct - a.effPct)[0];
+            const isBalanced = stats.globalDiff === 0;
+
+            const kpiContainer = document.getElementById('kpi-cards');
+            kpiContainer.innerHTML = `
+                <!-- KPI 1: Líder Actual -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-crown text-xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Líder Actual</p>
+                        <p class="text-xl font-black text-navy-900 truncate">${leader ? escapeHtml(leader.name) : '-'}</p>
+                        <p class="text-xs font-semibold text-court-700">${leader ? `${leader.totalPoints} pts (${leader.totalWins}V - ${leader.totalLosses}D)` : ''}</p>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Total Partidos Disputados -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-court-100 text-court-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-baseball text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Actividad Total</p>
+                        <p class="text-xl font-black text-navy-900">${stats.globalWins} <span class="text-xs font-semibold text-slate-500">Victorias reg.</span></p>
+                        <p class="text-xs font-medium text-slate-500">${stats.globalLosses} Derrotas registradas</p>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Mayor Efectividad -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Mayor Efectividad</p>
+                        <p class="text-xl font-black text-navy-900 truncate">${bestEff ? `${bestEff.effPct.toFixed(1)}%` : '0%'}</p>
+                        <p class="text-xs font-semibold text-sky-700 truncate">${bestEff ? escapeHtml(bestEff.name) : '-'}</p>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Estado de Cuadre Global -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border ${isBalanced ? 'border-emerald-200' : 'border-amber-300 bg-amber-50/30'} flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl ${isBalanced ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'} flex items-center justify-center shrink-0">
+                        <i class="fa-solid ${isBalanced ? 'fa-scale-balanced' : 'fa-triangle-exclamation'} text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Cuadre Global Liga</p>
+                        <p class="text-base font-black ${isBalanced ? 'text-emerald-700' : 'text-amber-700'}">
+                            ${isBalanced ? 'OK (Cuadra Exacto)' : `Revisar Dif: ${stats.globalDiff > 0 ? '+' + stats.globalDiff : stats.globalDiff}`}
+                        </p>
+                        <p class="text-[11px] text-slate-500">${stats.globalWins} Vic vs ${stats.globalLosses} Der</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRankingTable(stats) {
+            const tbody = document.getElementById('ranking-tbody');
+            tbody.innerHTML = stats.rankedPlayers.map((p, index) => {
+                const pos = index + 1;
+                let medalHtml = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-xs">${pos}°</span>`;
+                if (pos === 1) {
+                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 font-black text-sm shadow-sm border border-amber-300" title="1er Lugar"><i class="fa-solid fa-medal"></i></span>`;
+                } else if (pos === 2) {
+                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-black text-sm border border-slate-300" title="2do Lugar"><i class="fa-solid fa-medal"></i></span>`;
+                } else if (pos === 3) {
+                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm border border-orange-300" title="3er Lugar"><i class="fa-solid fa-medal"></i></span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50/90 transition ${pos === 1 ? 'bg-amber-50/20' : ''}">
+                        <td class="py-3.5 px-4 text-center">${medalHtml}</td>
+                        <td class="py-3.5 px-4 font-bold text-navy-900 text-base">${escapeHtml(p.name)}</td>
+                        <td class="py-3.5 px-4 text-center bg-court-50/60">
+                            <span class="inline-block px-3 py-1 rounded-lg bg-court-700 text-white font-black text-sm shadow-sm">${p.totalPoints}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.pj}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-emerald-700">${p.totalWins}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-rose-600">${p.totalLosses}</td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.winPct.toFixed(1)}%</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden hidden sm:block">
+                                    <div class="bg-court-600 h-2 rounded-full" style="width: ${Math.min(100, Math.max(0, p.effPct))}%"></div>
+                                </div>
+                                <span class="font-bold text-navy-900 text-xs">${p.effPct.toFixed(1)}%</span>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-500">${p.tieBreakerIndex.toFixed(3)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderChart(stats) {
+            const ctx = document.getElementById('rankingChart');
+            if (!ctx) return;
+
+            const labels = stats.rankedPlayers.map(p => p.name);
+            const pointsData = stats.rankedPlayers.map(p => p.totalPoints);
+            const winsData = stats.rankedPlayers.map(p => p.totalWins);
+            const lossesData = stats.rankedPlayers.map(p => p.totalLosses);
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Puntos Totales',
+                            data: pointsData,
+                            backgroundColor: '#15803d',
+                            borderRadius: 6,
+                        },
+                        {
+                            label: 'Victorias',
+                            data: winsData,
+                            backgroundColor: '#38bdf8',
+                            borderRadius: 6,
+                        },
+                        {
+                            label: 'Derrotas',
+                            data: lossesData,
+                            backgroundColor: '#fb7185',
+                            borderRadius: 6,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'Inter', weight: '600', size: 12 },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, font: { family: 'Inter' } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { font: { family: 'Inter', weight: '700' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderQuickMatchForm() {
+            const dateSelect = document.getElementById('quick-date');
+            const winnerSelect = document.getElementById('quick-winner');
+            const loserSelect = document.getElementById('quick-loser');
+
+            const prevDate = dateSelect.value;
+            const prevWinner = winnerSelect.value;
+            const prevLoser = loserSelect.value;
+
+            dateSelect.innerHTML = state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
+            if (prevDate && Number(prevDate) < state.dates.length) dateSelect.value = prevDate;
+
+            const playerOptions = state.players.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)}</option>`).join('');
+            winnerSelect.innerHTML = playerOptions;
+            loserSelect.innerHTML = playerOptions;
+
+            if (prevWinner && Number(prevWinner) < state.players.length) {
+                winnerSelect.value = prevWinner;
+            }
+            if (prevLoser && Number(prevLoser) < state.players.length && prevLoser !== winnerSelect.value) {
+                loserSelect.value = prevLoser;
+            } else if (state.players.length > 1) {
+                loserSelect.value = '1';
+            }
+
+            const logList = document.getElementById('quick-log-list');
+            const logCount = document.getElementById('quick-log-count');
+            logCount.textContent = `${state.quickLogs.length} registro${state.quickLogs.length === 1 ? '' : 's'}`;
+
+            if (state.quickLogs.length === 0) {
+                logList.innerHTML = `<p class="text-slate-400 italic py-2">Aún no has registrado partidos individuales en esta sesión.</p>`;
+            } else {
+                logList.innerHTML = state.quickLogs.slice(0, 8).map(item => `
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-navy-800 text-white font-bold text-[11px]">${escapeHtml(item.date)}</span>
+                            <span><strong class="text-emerald-700">${escapeHtml(item.winner)}</strong> venció a <strong class="text-rose-700">${escapeHtml(item.loser)}</strong></span>
+                        </div>
+                        <span class="text-[11px] text-slate-400">${escapeHtml(item.time)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // =========================================================================
+        // 4. ACCIONES INTERACTIVAS DEL USUARIO
+        // =========================================================================
+        function switchTab(tabName) {
+            ['ranking', 'quick'].forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    view.classList.remove('hidden');
+                    btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-tennis-neon text-navy-900 shadow-sm';
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20';
+                }
+            });
+            if (tabName === 'ranking') {
+                renderChart(computeLeagueStats());
+            }
+        }
+
+        function updateScoringRules() {
+            const w = parseInt(document.getElementById('pts-win-input').value, 10);
+            const l = parseInt(document.getElementById('pts-loss-input').value, 10);
+            state.ptsWin = isNaN(w) || w < 0 ? 0 : w;
+            state.ptsLoss = isNaN(l) || l < 0 ? 0 : l;
+            saveState();
+            renderAll();
+            showToast(`Puntuación actualizada: Victoria = ${state.ptsWin} pts, Derrota = ${state.ptsLoss} pt`);
+        }
+
+        function handleQuickMatchSubmit(e) {
+            e.preventDefault();
+            const dateIdx = parseInt(document.getElementById('quick-date').value, 10);
+            const winnerIdx = parseInt(document.getElementById('quick-winner').value, 10);
+            const loserIdx = parseInt(document.getElementById('quick-loser').value, 10);
+
+            if (winnerIdx === loserIdx) {
+                showToast('El ganador y el perdedor deben ser jugadores distintos.', 'warning');
+                return;
+            }
+
+            state.players[winnerIdx].wins[dateIdx] = (Number(state.players[winnerIdx].wins[dateIdx]) || 0) + 1;
+            state.players[loserIdx].losses[dateIdx] = (Number(state.players[loserIdx].losses[dateIdx]) || 0) + 1;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            state.quickLogs.unshift({
+                date: state.dates[dateIdx],
+                winner: state.players[winnerIdx].name,
+                loser: state.players[loserIdx].name,
+                time: timeStr
+            });
+
+            saveState();
+            renderAll();
+            showToast(`Partido registrado: ${state.players[winnerIdx].name} (+1V) vs ${state.players[loserIdx].name} (+1D)`);
+        }
+
+        // =========================================================================
+        // 5. UTILIDADES UI (TOASTS Y SEGURIDAD XSS)
+        // =========================================================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const isWarn = type === 'warning';
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white transform transition-all duration-300 ${isWarn ? 'bg-amber-600' : 'bg-navy-900 border border-court-600'}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${isWarn ? 'fa-circle-exclamation text-amber-200' : 'fa-circle-check text-tennis-neon'} text-sm"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+        });
+    </script>
+</body>
+</html>
