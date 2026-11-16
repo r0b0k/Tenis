@@ -10,7 +10,7 @@
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Font Awesome para iconografía deportiva -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js para gráficos de rendimiento -->
@@ -24,9 +24,9 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        court: { 50:'#fbf1e8', 100:'#f6dfcb', 200:'#efc6a6', 500:'#d9743f', 600:'#c2562b', 700:'#a8431f', 800:'#8a3519', 900:'#6b2a14' },
-                        navy: { 800:'#4a2e1b', 900:'#33200f', 950:'#1f1209' },
-                        tennis: { ball:'#f3f0a8', neon:'#e3ec4b' }
+                        court: { 50:'#ecfdf5', 100:'#d1fae5', 200:'#a7f3d0', 500:'#10b981', 600:'#059669', 700:'#047857', 800:'#065f46', 900:'#064e3b' },
+                        navy: { 800:'#27272a', 900:'#18181b', 950:'#09090b' },
+                        tennis: { ball:'#ecfccb', neon:'#a3e635' }
                     }
                 }
             }
@@ -56,30 +56,13 @@
             background: #94a3b8;
         }
 
-        /* ===== Tema retro: tenis en arcilla ===== */
-        body {
-            background-color: #f1e4d0;
-            background-image: radial-gradient(rgba(160,82,45,.10) 1px, transparent 1.4px), radial-gradient(rgba(255,255,255,.35) 1px, transparent 1.4px);
-            background-size: 22px 22px, 37px 37px;
-            background-position: 0 0, 11px 11px;
-            color: #33200f;
-        }
-        h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; letter-spacing: .01em; }
-        body .bg-white { background-color: #fffaf0; }
-        body .bg-slate-50 { background-color: #fbf3e6; }
-        body .bg-slate-100 { background-color: #f3e6d2; }
-        body .border-slate-100, body .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #f0e2cc; }
-        body .border-slate-200 { border-color: #e7d3b9; }
-        body .border-slate-300 { border-color: #d9bf9d; }
-        dialog { background: #fffaf0; color: #33200f; }
+        /* ===== Estilo moderno ===== */
+        body { background-color: #f6f7f9; color: #18181b; -webkit-font-smoothing: antialiased; }
+        dialog { background: #fff; color: #18181b; }
+        dialog::backdrop { background: rgba(24,24,27,.45); backdrop-filter: blur(2px); }
         select:disabled, input:disabled { opacity: .55; cursor: not-allowed; }
-        .clay-card {
-            background-color: #c0562b;
-            background-image: radial-gradient(rgba(255,255,255,.10) 1.2px, transparent 1.6px), radial-gradient(rgba(60,20,5,.18) 1.2px, transparent 1.6px), linear-gradient(135deg, #cf6a3b, #b34a22);
-            background-size: 18px 18px, 29px 29px, 100% 100%;
-            border: 3px solid #fffaf0;
-            box-shadow: 0 0 0 3px #c0562b, 0 10px 24px rgba(90,35,10,.25);
-        }
+        .card-hover { transition: box-shadow .2s ease, transform .2s ease; }
+        .card-hover:hover { box-shadow: 0 8px 24px -12px rgba(24,24,39,.18); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
@@ -101,47 +84,30 @@
     </dialog>
 
     <!-- Encabezado Deportivo -->
-    <header class="relative overflow-hidden bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
-        <div aria-hidden="true" class="absolute inset-0 pointer-events-none opacity-[.14]" style="background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20260%20120%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%272%27%3E%3Crect%20x%3D%275%27%20y%3D%275%27%20width%3D%27250%27%20height%3D%27110%27/%3E%3Crect%20x%3D%275%27%20y%3D%2720%27%20width%3D%27250%27%20height%3D%2780%27/%3E%3Cline%20x1%3D%27130%27%20y1%3D%275%27%20x2%3D%27130%27%20y2%3D%27115%27/%3E%3Cline%20x1%3D%2765%27%20y1%3D%2720%27%20x2%3D%2765%27%20y2%3D%27100%27/%3E%3Cline%20x1%3D%27195%27%20y1%3D%2720%27%20x2%3D%27195%27%20y2%3D%27100%27/%3E%3Cline%20x1%3D%2765%27%20y1%3D%2760%27%20x2%3D%27195%27%20y2%3D%2760%27/%3E%3C/svg%3E);background-size:540px auto;background-repeat:no-repeat;background-position:right -30px center"></div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-tennis-neon text-navy-900 flex items-center justify-center shadow-md shrink-0">
-                        <i class="fa-solid fa-trophy text-2xl"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-court-600/40 text-tennis-ball border border-tennis-neon/30">Temporada 2026</span>
-                            <span class="text-xs text-slate-300 hidden sm:inline">• Control Fines de Semana</span>
-                        </div>
-                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5 inline-flex items-center gap-2"><svg viewBox="0 0 26 26" class="w-7 h-7 shrink-0" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#e3ec4b" stroke="#fffaf0" stroke-width="1.5"/><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#fffaf0" stroke-width="1.8" stroke-linecap="round"/></svg> Liga de Tenis Rotativa (2026)</h1>
+    <header class="bg-white/85 backdrop-blur border-b border-zinc-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between gap-3 h-16">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-lime-300 flex items-center justify-center shrink-0"><svg viewBox="0 0 26 26" class="w-6 h-6" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#a3e635" stroke="#18181b" stroke-width="1.5"/><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#18181b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+                    <div class="min-w-0">
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 truncate leading-tight">Liga de Tenis Rotativa</h1>
+                        <p class="text-xs text-zinc-500 truncate">Temporada 2026 · Fines de semana</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span id="auth-user" class="hidden text-xs text-slate-300 truncate max-w-[180px]"></span>
-                    <button id="login-btn" type="button" onclick="openLogin()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
+                <div class="flex items-center gap-2 shrink-0">
+                    <span id="auth-user" class="hidden text-xs text-zinc-500 truncate max-w-[120px] sm:max-w-[200px]"></span>
+                    <button id="login-btn" type="button" onclick="openLogin()" class="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-700 text-white text-xs font-semibold flex items-center gap-1.5 transition">
                         <i class="fa-solid fa-lock"></i> Iniciar sesión
                     </button>
-                    <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
+                    <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-3 py-2 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 transition">
                         <i class="fa-solid fa-right-from-bracket"></i> Salir
                     </button>
                 </div>
             </div>
-
-            <!-- Barra de Navegación por Pestañas -->
-            <nav class="flex gap-2 mt-6 overflow-x-auto pb-1">
-                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-tennis-neon text-navy-900 shadow-sm">
-                    <i class="fa-solid fa-ranking-star"></i>
-                    <span>1. Ranking General</span>
-                </button>
-                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>2. Registro Rápido (1 vs 1)</span>
-                </button>
-                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <span>3. Resultados por Jornada</span>
-                </button>
+            <nav class="flex gap-1 pb-3 overflow-x-auto">
+                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-zinc-900 text-white"><i class="fa-solid fa-ranking-star text-xs"></i><span>Ranking</span></button>
+                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-zinc-600 hover:bg-zinc-100"><i class="fa-solid fa-bolt text-xs"></i><span>Registro rápido</span></button>
+                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-zinc-600 hover:bg-zinc-100"><i class="fa-solid fa-calendar-days text-xs"></i><span>Jornadas</span></button>
             </nav>
         </div>
     </header>
@@ -155,17 +121,17 @@
         <section id="view-ranking" class="space-y-6">
             
             <!-- Tabla Principal de Ranking -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="px-6 py-4 bg-navy-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fa-solid fa-medal text-tennis-neon"></i>
+                        <h2 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                            <i class="fa-solid fa-medal text-emerald-600"></i>
                             Tabla General de Posiciones
                         </h2>
-                        <p class="text-xs text-slate-300">Ordenada automáticamente por Índice de Desempate en tiempo real</p>
+                        <p class="text-xs text-zinc-500">Ordenada automáticamente por Índice de Desempate en tiempo real</p>
                     </div>
-                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-600 text-white">
-                        <span class="w-2 h-2 rounded-full bg-amber-200 animate-pulse"></span>
+                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                         Conectando a nube...
                     </span>
                 </div>
@@ -173,7 +139,7 @@
                 <div class="overflow-x-auto table-scroll">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <tr class="bg-slate-50 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                                 <th class="py-3.5 px-4 text-center w-16">Pos.</th>
                                 <th class="py-3.5 px-4">Jugador</th>
                                 <th class="py-3.5 px-4 text-center bg-court-50/70 text-court-900">Puntos Totales</th>
@@ -196,16 +162,16 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
-                <div class="lg:col-span-2 clay-card rounded-2xl p-6 flex flex-col justify-between">
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div>
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chart-line text-tennis-neon"></i> Rendimiento por Jornada</h3>
-                            <p id="chart-subtitle" class="text-xs text-orange-100">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
-                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/25 text-orange-50 text-xs font-semibold"></div>
+                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><i class="fa-solid fa-chart-line text-emerald-600"></i> Rendimiento por Jornada</h3>
+                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
                         </div>
-                        <div class="inline-flex rounded-xl bg-black/20 p-1 self-start sm:self-auto">
+                        <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
                             <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition"><i class="fa-solid fa-trophy mr-1"></i>Victorias</button>
-                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-orange-100 hover:text-white transition"><i class="fa-solid fa-star mr-1"></i>Puntos</button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><i class="fa-solid fa-star mr-1"></i>Puntos</button>
                         </div>
                     </div>
                     <div class="relative h-72 w-full">
@@ -214,7 +180,7 @@
                 </div>
 
                 <!-- Panel de Reglas y Sistema de Puntuación Configurable (1 columna) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between space-y-5">
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between space-y-5">
                     <div>
                         <div class="flex items-center gap-2 text-navy-900 mb-1">
                             <i class="fa-solid fa-sliders text-court-600"></i>
@@ -222,7 +188,7 @@
                         </div>
                         <p class="text-xs text-slate-500 mb-4">Valores configurables.</p>
 
-                        <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                        <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-zinc-200/80">
                             <div class="flex items-center justify-between">
                                 <label for="pts-win-input" class="text-xs font-bold text-slate-700">Puntos por Victoria:</label>
                                 <div class="flex items-center gap-2">
@@ -254,7 +220,7 @@
                 </div>
             </div>
             <!-- Panel de jugadores (solo editores) -->
-            <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
                 <div class="flex items-center gap-2 text-navy-900">
                     <i class="fa-solid fa-users text-court-600"></i>
                     <h3 class="text-base font-bold">Jugadores</h3>
@@ -271,15 +237,15 @@
         <!-- PESTAÑA 2: REGISTRO RÁPIDO DE PARTIDO (1 VS 1)            -->
         <!-- ========================================================= -->
         <section id="view-quick" class="hidden max-w-3xl mx-auto space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="px-6 py-5 bg-gradient-to-r from-court-800 to-navy-900 text-white">
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
+                <div class="px-6 py-5 border-b border-zinc-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-tennis-neon text-navy-900 flex items-center justify-center shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-lime-200 text-lime-800 flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-bolt text-lg"></i>
                         </div>
                         <div>
-                            <h2 class="text-lg font-bold">Asistente Rápido de Partido (1 vs 1)</h2>
-                            <p class="text-xs text-slate-200">Registra un encuentro individual: suma una victoria al ganador y una derrota al perdedor en la jornada elegida.</p>
+                            <h2 class="text-lg font-bold text-zinc-900">Asistente Rápido de Partido (1 vs 1)</h2>
+                            <p class="text-xs text-zinc-500">Registra un encuentro individual: suma una victoria al ganador y una derrota al perdedor en la jornada elegida.</p>
                         </div>
                     </div>
                 </div>
@@ -326,7 +292,7 @@
             </div>
 
             <!-- Historial Reciente de Partidos Rápidos de la Sesión -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-sm font-bold text-navy-900">Últimos partidos anotados desde el Asistente</h3>
                     <span id="quick-log-count" class="text-xs font-semibold text-slate-500">0 registros</span>
@@ -341,7 +307,7 @@
         <!-- PESTAÑA 3: RESULTADOS POR JORNADA (EDITABLE)              -->
         <!-- ========================================================= -->
         <section id="view-rounds" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-navy-900 flex items-center gap-2">
                         <i class="fa-solid fa-calendar-check text-court-600"></i>
@@ -358,7 +324,7 @@
             </div>
 
             <!-- Agregar nueva jornada (solo editores) -->
-            <form id="round-add-form" data-admin-only onsubmit="addRound(event)" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <form id="round-add-form" data-admin-only onsubmit="addRound(event)" class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-court-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-calendar-plus"></i></div>
                     <div>
@@ -381,7 +347,7 @@
     </main>
 
     <!-- Pie de página -->
-    <footer class="bg-white border-t border-slate-200 mt-12 py-5">
+    <footer class="bg-white border-t border-zinc-200 mt-12 py-5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <p><strong>Liga de Tenis Rotativa (2026)</strong> • Basado exactamente en la lógica de <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">Registro_Tenis_Fines_de_Semana_2026-v3.xlsx</code></p>
             <p id="footer-sync-status" class="flex items-center gap-1.5 text-court-700 font-medium">
@@ -452,16 +418,16 @@
             const badge = document.getElementById('sync-status-badge');
             const footer = document.getElementById('footer-sync-status');
             if (!badge) return;
-
+            const base = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ring-1 ';
             if (status === 'online') {
-                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-court-700 text-white';
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-tennis-neon animate-pulse"></span> ${escapeHtml(text)}`;
+                badge.className = base + 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ${escapeHtml(text)}`;
                 if (footer) footer.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${escapeHtml(text)}`;
             } else if (status === 'saving') {
-                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-700 text-white';
+                badge.className = base + 'bg-sky-50 text-sky-700 ring-sky-200';
                 badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Guardando...`;
             } else {
-                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-700 text-white';
+                badge.className = base + 'bg-rose-50 text-rose-700 ring-rose-200';
                 badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(text)}`;
             }
         }
@@ -680,25 +646,14 @@
 
             if (metric === 'wins') {
                 winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
-                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-orange-100 hover:text-white transition';
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition';
                 subtitle.textContent = 'Evolución de victorias obtenidas por cada jugador a lo largo de las fechas';
             } else {
                 pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
-                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-orange-100 hover:text-white transition';
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition';
                 subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
             }
             renderChart(computeLeagueStats());
-        }
-
-        const BALL_CACHE = {};
-        function ballImage(color) {
-            if (BALL_CACHE[color]) return BALL_CACHE[color];
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="#e3ec4b" stroke="${color}" stroke-width="3"/><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#fffaf0" stroke-width="1.8" stroke-linecap="round"/></svg>`;
-            const img = new Image(26, 26);
-            img.onload = () => { if (chartInstance) chartInstance.update('none'); };
-            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-            BALL_CACHE[color] = img;
-            return img;
         }
 
         function renderChart(stats) {
@@ -708,18 +663,14 @@
             const labels = state.dates;
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
-            const cream = '#fff3e0';
-
-            // Colores pensados para contrastar sobre la arcilla
-            const palette = ['#fffaf0', '#2b1a0f', '#7fd1ae', '#8ec5ff', '#ffd166', '#f4a6c0', '#c9b6ff', '#ffffff'];
+            const palette = ['#059669', '#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16', '#ec4899'];
 
             const lead = stats && stats.rankedPlayers && stats.rankedPlayers[0];
             const chip = document.getElementById('chart-leader');
-            if (chip && lead) chip.innerHTML = `<i class="fa-solid fa-crown text-tennis-neon"></i> Líder: <strong>${escapeHtml(lead.name)}</strong> · ${lead.totalPoints} pts`;
+            if (chip && lead) chip.innerHTML = `<i class="fa-solid fa-crown text-amber-500"></i> Líder: <strong>${escapeHtml(lead.name)}</strong> · ${lead.totalPoints} pts`;
 
             const datasets = state.players.map((p, idx) => {
                 const color = palette[idx % palette.length];
-                const img = ballImage(color);
                 const seriesData = state.dates.map((_, dIdx) => {
                     const w = Number(p.wins[dIdx]) || 0;
                     const l = Number(p.losses[dIdx]) || 0;
@@ -730,12 +681,14 @@
                     data: seriesData,
                     borderColor: color,
                     backgroundColor: color,
-                    borderWidth: 3,
-                    pointStyle: img.complete ? img : 'circle',
-                    pointRadius: 9,
-                    pointHoverRadius: 11,
+                    borderWidth: 2.5,
+                    pointBackgroundColor: color,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                     fill: false,
-                    tension: 0.3
+                    tension: 0.35
                 };
             });
 
@@ -750,26 +703,12 @@
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: { position: 'top', labels: { color: cream, font: { weight: '700', size: 12 }, usePointStyle: true } },
-                        tooltip: {
-                            backgroundColor: '#2e1c10', titleColor: '#e3ec4b', bodyColor: '#fffaf0',
-                            borderColor: '#fffaf0', borderWidth: 1, padding: 10,
-                            titleFont: { family: 'Playfair Display', weight: '700', size: 13 }
-                        }
+                        legend: { position: 'top', align: 'end', labels: { color: '#52525b', font: { weight: '600', size: 12 }, usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { backgroundColor: '#18181b', titleColor: '#fff', bodyColor: '#e4e4e7', padding: 10, cornerRadius: 10, boxPadding: 4 }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { precision: 0, color: cream },
-                            grid: { color: 'rgba(255,250,240,.45)', lineWidth: 1.5 },
-                            border: { color: '#fffaf0', width: 2 },
-                            title: { display: true, text: chartMetric === 'wins' ? 'Victorias' : 'Puntos', color: cream, font: { weight: '700' } }
-                        },
-                        x: {
-                            ticks: { color: cream, maxRotation: 60 },
-                            grid: { color: 'rgba(255,250,240,.22)' },
-                            border: { color: '#fffaf0', width: 2 }
-                        }
+                        y: { beginAtZero: true, ticks: { precision: 0, color: '#71717a' }, grid: { color: '#f4f4f5' }, border: { display: false } },
+                        x: { ticks: { color: '#71717a', maxRotation: 60 }, grid: { display: false }, border: { color: '#e4e4e7' } }
                     }
                 }
             });
@@ -796,7 +735,7 @@
                 const diff = totalWins - totalLosses;
                 const hasActivity = totalWins > 0 || totalLosses > 0;
 
-                let statusBadge = hasActivity ? (diff === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-200">OK</span>` : `<span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/25 text-amber-200">Dif: ${diff}</span>`) : `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-200 text-slate-600">Sin partidos</span>`;
+                let statusBadge = hasActivity ? (diff === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-700 font-semibold">OK</span>` : `<span class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-700 font-semibold">Dif: ${diff}</span>`) : `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-200 text-slate-600">Sin partidos</span>`;
 
                 const rowsHtml = state.players.map((p, pIdx) => {
                     const w = Number(p.wins[dIdx]) || 0;
@@ -817,10 +756,10 @@
                 }).join('');
 
                 return `
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+                    <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden flex flex-col justify-between card-hover">
                         <div>
-                            <div class="px-4 py-3 bg-navy-900 text-white flex items-center justify-between">
-                                <span class="font-bold text-sm">${escapeHtml(dateLabel)}</span>
+                            <div class="px-4 py-3 border-b border-zinc-200 flex items-center justify-between">
+                                <span class="font-bold text-sm text-zinc-900">${escapeHtml(dateLabel)}</span>
                                 ${statusBadge}
                             </div>
                             <table class="w-full text-left border-collapse">
@@ -889,7 +828,7 @@
             logList.innerHTML = state.quickLogs.length === 0
                 ? `<p class="text-slate-400 italic py-2">Sin registros todavía.</p>`
                 : state.quickLogs.slice(0, 8).map(i => `
-                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-zinc-200 flex items-center justify-between gap-2">
                         <span><strong>${escapeHtml(i.winner)}</strong> venció a <strong>${escapeHtml(i.loser)}</strong> (${escapeHtml(i.date)})</span>
                         ${i.winnerIdx !== undefined ? `<button type="button" data-id="${escapeHtml(i.id)}" onclick="undoQuickLog(this.dataset.id)" class="shrink-0 px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">Deshacer</button>` : ''}
                     </div>`).join('');
@@ -901,10 +840,10 @@
                 const btn = document.getElementById(`tab-btn-${t}`);
                 if (t === tabName) {
                     view.classList.remove('hidden');
-                    btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-tennis-neon text-navy-900 shadow-sm';
+                    btn.className = 'tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-zinc-900 text-white';
                 } else {
                     view.classList.add('hidden');
-                    btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20';
+                    btn.className = 'tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-zinc-600 hover:bg-zinc-100';
                 }
             });
             if (tabName === 'ranking') renderChart(computeLeagueStats());
