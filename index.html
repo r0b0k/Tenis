@@ -355,7 +355,6 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'tenis-rotativo-2026';
 
-        // Ruta pública compartida para que todos los amigos lean y editen la misma liga
         const leagueDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'liga_tenis', 'temporada_2026');
 
         const DEFAULT_DATES = [
@@ -373,24 +372,9 @@
                 ptsLoss: 1,
                 dates: [...DEFAULT_DATES],
                 players: [
-                    {
-                        id: 'p1',
-                        name: 'Rodrigo',
-                        wins: createWinsRow(3),
-                        losses: createLossesRow(3)
-                    },
-                    {
-                        id: 'p2',
-                        name: 'Gera',
-                        wins: createWinsRow(3),
-                        losses: createLossesRow(3)
-                    },
-                    {
-                        id: 'p3',
-                        name: 'Alexis',
-                        wins: createWinsRow(4),
-                        losses: createLossesRow(2)
-                    }
+                    { id: 'p1', name: 'Rodrigo', wins: createWinsRow(3), losses: createLossesRow(3) },
+                    { id: 'p2', name: 'Gera', wins: createWinsRow(3), losses: createLossesRow(3) },
+                    { id: 'p3', name: 'Alexis', wins: createWinsRow(4), losses: createLossesRow(2) }
                 ],
                 quickLogs: []
             };
@@ -413,7 +397,7 @@
                 if (footer) footer.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${escapeHtml(text)}`;
             } else if (status === 'saving') {
                 badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-700 text-white';
-                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Guardando en nube...`;
+                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Guardando...`;
             } else {
                 badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-700 text-white';
                 badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(text)}`;
@@ -438,26 +422,33 @@
                         updateSyncBadge('online', 'Sincronizado en tiempo real');
                     }
                 } else {
-                    // Si es la primera vez que se abre, inicializa la base de datos en Firestore con los datos del Excel
                     await saveState();
                     renderAll();
                 }
             }, (error) => {
                 console.error('Error en suscripción Firestore:', error);
-                updateSyncBadge('error', `Error Firestore: ${error.code || 'permisos'}`);
-                showToast(`Error de lectura (${error.code}): Revisa las reglas de Firestore.`, 'warning');
+                updateSyncBadge('error', `Error Firestore: ${error.code}`);
+                showToast(`Error de lectura (${error.code}): Revisa reglas o dominio.`, 'warning');
             });
         }
 
         async function initFirebaseSync() {
             if (window.location.protocol === 'file:') {
-                updateSyncBadge('error', 'Error: Abre usando servidor local (HTTP)');
-                showToast('Firebase Auth no funciona abriendo el HTML directamente (file://). Usa Live Server o GitHub Pages.', 'warning');
+                updateSyncBadge('error', 'Usa servidor local (HTTP)');
                 return;
             }
 
+            // Timeout de seguridad por si Firebase tarda más de 8 segundos en conectar
+            const connectionTimeout = setTimeout(() => {
+                if (!currentUser) {
+                    updateSyncBadge('error', 'Timeout: Bloqueado por AdBlock/Red');
+                    showToast('La conexión a Firebase tardó demasiado. Desactiva bloqueadores de publicidad (uBlock/Brave Shields).', 'warning');
+                }
+            }, 8000);
+
             onAuthStateChanged(auth, (user) => {
                 if (user) {
+                    clearTimeout(connectionTimeout);
                     currentUser = user;
                     subscribeToLeagueData();
                 }
@@ -470,21 +461,19 @@
                     await signInAnonymously(auth);
                 }
             } catch (err) {
+                clearTimeout(connectionTimeout);
                 console.error('Error inicializando autenticación:', err);
-                let msg = `Error Auth: ${err.code || err.message}`;
-                if (err.code === 'auth/operation-not-allowed') {
-                    msg = 'Habilita Auth Anónima en Firebase';
-                } else if (err.code === 'auth/unauthorized-domain') {
-                    msg = 'Agrega este dominio en Firebase Auth';
-                }
+                let msg = `Auth Error: ${err.code}`;
+                if (err.code === 'auth/operation-not-allowed') msg = 'Habilita Auth Anónima';
+                if (err.code === 'auth/unauthorized-domain') msg = 'Dominio no autorizado en Firebase';
                 updateSyncBadge('error', msg);
-                showToast(`Fallo de conexión (${err.code}). Revisa Firebase Console.`, 'warning');
+                showToast(`Fallo Auth (${err.code}). Revisa la consola (F12).`, 'warning');
             }
         }
 
         async function saveState() {
             if (!currentUser) {
-                showToast('No hay sesión activa para guardar cambios.', 'warning');
+                showToast('Esperando autenticación con Firebase...', 'warning');
                 return;
             }
             try {
@@ -500,13 +489,13 @@
                 updateSyncBadge('online', 'Sincronizado en tiempo real');
             } catch (e) {
                 console.error('Error guardando en Firestore:', e);
-                updateSyncBadge('error', `Error al guardar: ${e.code || 'red'}`);
-                showToast(`Error al guardar (${e.code}): Revisa reglas de escritura.`, 'warning');
+                updateSyncBadge('error', `Error al guardar: ${e.code}`);
+                showToast(`Error al guardar (${e.code}): Revisa las reglas de Firestore.`, 'warning');
             }
         }
 
         // =========================================================================
-        // 2. MOTOR DE CÁLCULO (FÓRMULAS EXACTAS DEL EXCEL)
+        // 2. MOTOR DE CÁLCULO
         // =========================================================================
         function computeLeagueStats() {
             const ptsWin = Number(state.ptsWin) || 0;
@@ -539,29 +528,19 @@
             });
 
             const rankedPlayers = [...playerStats].sort((a, b) => b.tieBreakerIndex - a.tieBreakerIndex);
-
             const globalWins = playerStats.reduce((acc, p) => acc + p.totalWins, 0);
             const globalLosses = playerStats.reduce((acc, p) => acc + p.totalLosses, 0);
-            const globalDiff = globalWins - globalLosses;
 
-            return {
-                playerStats,
-                rankedPlayers,
-                globalWins,
-                globalLosses,
-                globalDiff
-            };
+            return { playerStats, rankedPlayers, globalWins, globalLosses };
         }
 
         // =========================================================================
-        // 3. RENDERIZADO DE TODAS LAS VISTAS
+        // 3. RENDERIZADO Y ACCIONES
         // =========================================================================
         function renderAll() {
             const stats = computeLeagueStats();
-
             document.getElementById('pts-win-input').value = state.ptsWin;
             document.getElementById('pts-loss-input').value = state.ptsLoss;
-
             renderRankingTable(stats);
             renderChart(stats);
             renderQuickMatchForm();
@@ -583,7 +562,6 @@
                 winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
                 subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
             }
-
             renderChart(computeLeagueStats());
         }
 
@@ -598,9 +576,7 @@
             const playerColors = [
                 { stroke: '#15803d', fill: 'rgba(21, 128, 61, 0.12)' },
                 { stroke: '#2563eb', fill: 'rgba(37, 99, 235, 0.12)' },
-                { stroke: '#d97706', fill: 'rgba(217, 119, 6, 0.12)' },
-                { stroke: '#7c3aed', fill: 'rgba(124, 58, 237, 0.12)' },
-                { stroke: '#db2777', fill: 'rgba(219, 39, 119, 0.12)' }
+                { stroke: '#d97706', fill: 'rgba(217, 119, 6, 0.12)' }
             ];
 
             const datasets = state.players.map((p, idx) => {
@@ -621,54 +597,24 @@
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 1.5,
                     pointRadius: 4,
-                    pointHoverRadius: 6,
                     fill: false,
                     tension: 0.25
                 };
             });
 
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+            if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels,
-                    datasets
-                },
+                data: { labels, datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: { family: 'Inter', weight: '600', size: 12 },
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        }
-                    },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', weight: '600', size: 12 }, usePointStyle: true } } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { precision: 0, font: { family: 'Inter' } },
-                            grid: { color: '#f1f5f9' },
-                            title: {
-                                display: true,
-                                text: chartMetric === 'wins' ? 'Victorias en la Jornada' : 'Puntos en la Jornada',
-                                font: { family: 'Inter', size: 11, weight: '600' }
-                            }
-                        },
-                        x: {
-                            ticks: { font: { family: 'Inter', weight: '600', size: 11 } },
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -686,10 +632,7 @@
 
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
-
-            const indicesToRender = currentFilter === 'all'
-                ? state.dates.map((_, idx) => idx)
-                : [parseInt(currentFilter, 10)];
+            const indicesToRender = currentFilter === 'all' ? state.dates.map((_, idx) => idx) : [parseInt(currentFilter, 10)];
 
             grid.innerHTML = indicesToRender.map(dIdx => {
                 const dateLabel = state.dates[dIdx];
@@ -698,67 +641,37 @@
                 const diff = totalWins - totalLosses;
                 const hasActivity = totalWins > 0 || totalLosses > 0;
 
-                let statusBadge = '';
-                if (!hasActivity) {
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-600">Sin partidos</span>`;
-                } else if (diff === 0) {
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-200 border border-emerald-400/40"><i class="fa-solid fa-circle-check mr-1"></i>OK (Cuadra)</span>`;
-                } else {
-                    const sign = diff > 0 ? `+${diff}` : `${diff}`;
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/25 text-amber-200 border border-amber-400/50"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Dif: ${sign}</span>`;
-                }
+                let statusBadge = hasActivity ? (diff === 0 ? `<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-200">OK</span>` : `<span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/25 text-amber-200">Dif: ${diff}</span>`) : `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-200 text-slate-600">Sin partidos</span>`;
 
                 const rowsHtml = state.players.map((p, pIdx) => {
                     const w = Number(p.wins[dIdx]) || 0;
                     const l = Number(p.losses[dIdx]) || 0;
                     const roundPts = (w * ptsWin) + (l * ptsLoss);
-
                     return `
                         <tr class="hover:bg-slate-50 transition">
                             <td class="py-2.5 px-3 font-bold text-navy-900 text-xs">${escapeHtml(p.name)}</td>
                             <td class="py-2 px-2 text-center">
-                                <input type="number" min="0" value="${w}" onchange="updateRoundStat('wins', ${pIdx}, ${dIdx}, this.value)" aria-label="Victorias de ${escapeHtml(p.name)} en ${escapeHtml(dateLabel)}" class="w-14 text-center font-extrabold text-emerald-800 bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 rounded-lg py-1 text-xs focus:ring-2 focus:ring-court-500 focus:outline-none">
+                                <input type="number" min="0" value="${w}" onchange="updateRoundStat('wins', ${pIdx}, ${dIdx}, this.value)" class="w-14 text-center font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg py-1 text-xs">
                             </td>
                             <td class="py-2 px-2 text-center">
-                                <input type="number" min="0" value="${l}" onchange="updateRoundStat('losses', ${pIdx}, ${dIdx}, this.value)" aria-label="Derrotas de ${escapeHtml(p.name)} en ${escapeHtml(dateLabel)}" class="w-14 text-center font-extrabold text-rose-800 bg-rose-50/70 hover:bg-rose-50 border border-rose-200 rounded-lg py-1 text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                                <input type="number" min="0" value="${l}" onchange="updateRoundStat('losses', ${pIdx}, ${dIdx}, this.value)" class="w-14 text-center font-extrabold text-rose-800 bg-rose-50 border border-rose-200 rounded-lg py-1 text-xs">
                             </td>
-                            <td class="py-2.5 px-3 text-right">
-                                <span class="inline-block px-2 py-0.5 rounded-md bg-court-100 text-court-900 font-black text-xs">${roundPts} pts</span>
-                            </td>
+                            <td class="py-2.5 px-3 text-right font-black text-xs text-court-900">${roundPts} pts</td>
                         </tr>
                     `;
                 }).join('');
 
                 return `
-                    <div class="bg-white rounded-2xl shadow-sm border ${diff !== 0 && hasActivity ? 'border-amber-300' : 'border-slate-200'} overflow-hidden flex flex-col justify-between">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="px-4 py-3 bg-navy-900 text-white flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-6 h-6 rounded-lg bg-tennis-neon text-navy-900 font-black text-xs flex items-center justify-center">${dIdx + 1}</span>
-                                    <h3 class="font-bold text-sm">${escapeHtml(dateLabel)}</h3>
-                                </div>
+                            <div class="px-4 py-3 bg-navy-900 text-white flex items-center justify-between">
+                                <span class="font-bold text-sm">${escapeHtml(dateLabel)}</span>
                                 ${statusBadge}
                             </div>
                             <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                                        <th class="py-2 px-3">Jugador</th>
-                                        <th class="py-2 px-2 text-center text-emerald-700">Victorias</th>
-                                        <th class="py-2 px-2 text-center text-rose-700">Derrotas</th>
-                                        <th class="py-2 px-3 text-right text-court-900">Pts Jorn.</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    ${rowsHtml}
-                                </tbody>
+                                <thead><tr class="bg-slate-50 text-[10px] text-slate-500 uppercase"><th class="py-2 px-3">Jugador</th><th class="py-2 px-2 text-center">Vic</th><th class="py-2 px-2 text-center">Der</th><th class="py-2 px-3 text-right">Pts</th></tr></thead>
+                                <tbody class="divide-y divide-slate-100">${rowsHtml}</tbody>
                             </table>
-                        </div>
-                        <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] font-bold text-slate-600">
-                            <span>Totales Jornada:</span>
-                            <div class="flex items-center gap-3">
-                                <span class="text-emerald-700">${totalWins} Vic</span>
-                                <span class="text-rose-700">${totalLosses} Der</span>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -770,42 +683,23 @@
             state.players[playerIdx][type][dateIdx] = val;
             saveState();
             renderAll();
-            const label = type === 'wins' ? 'Victorias' : 'Derrotas';
-            showToast(`${state.players[playerIdx].name} (${state.dates[dateIdx]}): ${label} = ${val}`);
+            showToast(`${state.players[playerIdx].name} actualizado con éxito`);
         }
 
         function renderRankingTable(stats) {
             const tbody = document.getElementById('ranking-tbody');
             tbody.innerHTML = stats.rankedPlayers.map((p, index) => {
                 const pos = index + 1;
-                let medalHtml = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-xs">${pos}°</span>`;
-                if (pos === 1) {
-                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 font-black text-sm shadow-sm border border-amber-300" title="1er Lugar"><i class="fa-solid fa-medal"></i></span>`;
-                } else if (pos === 2) {
-                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-black text-sm border border-slate-300" title="2do Lugar"><i class="fa-solid fa-medal"></i></span>`;
-                } else if (pos === 3) {
-                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm border border-orange-300" title="3er Lugar"><i class="fa-solid fa-medal"></i></span>`;
-                }
-
                 return `
-                    <tr class="hover:bg-slate-50/90 transition ${pos === 1 ? 'bg-amber-50/20' : ''}">
-                        <td class="py-3.5 px-4 text-center">${medalHtml}</td>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3.5 px-4 text-center font-bold text-xs">${pos}°</td>
                         <td class="py-3.5 px-4 font-bold text-navy-900 text-base">${escapeHtml(p.name)}</td>
-                        <td class="py-3.5 px-4 text-center bg-court-50/60">
-                            <span class="inline-block px-3 py-1 rounded-lg bg-court-700 text-white font-black text-sm shadow-sm">${p.totalPoints}</span>
-                        </td>
+                        <td class="py-3.5 px-4 text-center bg-court-50/60 font-black text-sm text-court-800">${p.totalPoints}</td>
                         <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.pj}</td>
                         <td class="py-3.5 px-4 text-center font-bold text-emerald-700">${p.totalWins}</td>
                         <td class="py-3.5 px-4 text-center font-bold text-rose-600">${p.totalLosses}</td>
                         <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.winPct.toFixed(1)}%</td>
-                        <td class="py-3.5 px-4 text-center">
-                            <div class="flex items-center justify-center gap-2">
-                                <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden hidden sm:block">
-                                    <div class="bg-court-600 h-2 rounded-full" style="width: ${Math.min(100, Math.max(0, p.effPct))}%"></div>
-                                </div>
-                                <span class="font-bold text-navy-900 text-xs">${p.effPct.toFixed(1)}%</span>
-                            </div>
-                        </td>
+                        <td class="py-3.5 px-4 text-center font-bold text-navy-900 text-xs">${p.effPct.toFixed(1)}%</td>
                         <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-500">${p.tieBreakerIndex.toFixed(3)}</td>
                     </tr>
                 `;
@@ -817,48 +711,18 @@
             const winnerSelect = document.getElementById('quick-winner');
             const loserSelect = document.getElementById('quick-loser');
 
-            const prevDate = dateSelect.value;
-            const prevWinner = winnerSelect.value;
-            const prevLoser = loserSelect.value;
-
             dateSelect.innerHTML = state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
-            if (prevDate && Number(prevDate) < state.dates.length) dateSelect.value = prevDate;
-
             const playerOptions = state.players.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)}</option>`).join('');
             winnerSelect.innerHTML = playerOptions;
             loserSelect.innerHTML = playerOptions;
-
-            if (prevWinner && Number(prevWinner) < state.players.length) {
-                winnerSelect.value = prevWinner;
-            }
-            if (prevLoser && Number(prevLoser) < state.players.length && prevLoser !== winnerSelect.value) {
-                loserSelect.value = prevLoser;
-            } else if (state.players.length > 1) {
-                loserSelect.value = '1';
-            }
+            if (state.players.length > 1) loserSelect.value = '1';
 
             const logList = document.getElementById('quick-log-list');
-            const logCount = document.getElementById('quick-log-count');
-            logCount.textContent = `${state.quickLogs.length} registro${state.quickLogs.length === 1 ? '' : 's'}`;
-
-            if (state.quickLogs.length === 0) {
-                logList.innerHTML = `<p class="text-slate-400 italic py-2">Aún no has registrado partidos individuales en esta sesión.</p>`;
-            } else {
-                logList.innerHTML = state.quickLogs.slice(0, 8).map(item => `
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded bg-navy-800 text-white font-bold text-[11px]">${escapeHtml(item.date)}</span>
-                            <span><strong class="text-emerald-700">${escapeHtml(item.winner)}</strong> venció a <strong class="text-rose-700">${escapeHtml(item.loser)}</strong></span>
-                        </div>
-                        <span class="text-[11px] text-slate-400">${escapeHtml(item.time)}</span>
-                    </div>
-                `).join('');
-            }
+            document.getElementById('quick-log-count').textContent = `${state.quickLogs.length} registros`;
+            logList.innerHTML = state.quickLogs.length === 0 ? `<p class="text-slate-400 italic py-2">Sin registros en esta sesión.</p>` :
+                state.quickLogs.slice(0, 8).map(i => `<div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200"><strong>${escapeHtml(i.winner)}</strong> venció a <strong>${escapeHtml(i.loser)}</strong> (${escapeHtml(i.date)})</div>`).join('');
         }
 
-        // =========================================================================
-        // 4. ACCIONES INTERACTIVAS DEL USUARIO
-        // =========================================================================
         function switchTab(tabName) {
             ['ranking', 'quick', 'rounds'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
@@ -871,19 +735,16 @@
                     btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20';
                 }
             });
-            if (tabName === 'ranking') {
-                renderChart(computeLeagueStats());
-            }
+            if (tabName === 'ranking') renderChart(computeLeagueStats());
         }
 
         function updateScoringRules() {
             const w = parseInt(document.getElementById('pts-win-input').value, 10);
             const l = parseInt(document.getElementById('pts-loss-input').value, 10);
-            state.ptsWin = isNaN(w) || w < 0 ? 0 : w;
-            state.ptsLoss = isNaN(l) || l < 0 ? 0 : l;
+            state.ptsWin = isNaN(w) ? 2 : w;
+            state.ptsLoss = isNaN(l) ? 1 : l;
             saveState();
             renderAll();
-            showToast(`Puntuación actualizada: Victoria = ${state.ptsWin} pts, Derrota = ${state.ptsLoss} pt`);
         }
 
         function handleQuickMatchSubmit(e) {
@@ -893,56 +754,38 @@
             const loserIdx = parseInt(document.getElementById('quick-loser').value, 10);
 
             if (winnerIdx === loserIdx) {
-                showToast('El ganador y el perdedor deben ser jugadores distintos.', 'warning');
+                showToast('El ganador y el perdedor deben ser distintos.', 'warning');
                 return;
             }
 
             state.players[winnerIdx].wins[dateIdx] = (Number(state.players[winnerIdx].wins[dateIdx]) || 0) + 1;
             state.players[loserIdx].losses[dateIdx] = (Number(state.players[loserIdx].losses[dateIdx]) || 0) + 1;
 
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
             state.quickLogs.unshift({
                 date: state.dates[dateIdx],
                 winner: state.players[winnerIdx].name,
                 loser: state.players[loserIdx].name,
-                time: timeStr
+                time: new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
             });
 
             saveState();
             renderAll();
-            showToast(`Partido registrado: ${state.players[winnerIdx].name} (+1V) vs ${state.players[loserIdx].name} (+1D)`);
+            showToast('Partido registrado correctamente');
         }
 
-        // =========================================================================
-        // 5. UTILIDADES UI (TOASTS Y SEGURIDAD XSS)
-        // =========================================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const isWarn = type === 'warning';
-            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white transform transition-all duration-300 ${isWarn ? 'bg-amber-600' : 'bg-navy-900 border border-court-600'}`;
-            toast.innerHTML = `
-                <i class="fa-solid ${isWarn ? 'fa-circle-exclamation text-amber-200' : 'fa-circle-check text-tennis-neon'} text-sm"></i>
-                <span>${escapeHtml(message)}</span>
-            `;
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white ${type === 'warning' ? 'bg-amber-600' : 'bg-navy-900'}`;
+            toast.innerHTML = escapeHtml(message);
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3200);
+            setTimeout(() => toast.remove(), 3000);
         }
 
         function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // Exponer funciones al ámbito global window para los atributos onclick/onchange del HTML
         window.switchTab = switchTab;
         window.setChartMetric = setChartMetric;
         window.updateScoringRules = updateScoringRules;
