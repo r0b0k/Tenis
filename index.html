@@ -13,7 +13,7 @@
     <!-- Font Awesome para iconografía deportiva -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js para gráficos de rendimiento -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.js"></script>
 
     <script>
         tailwind.config = {
@@ -75,33 +75,24 @@
 
     <!-- Notificación Toast Flotante -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <!-- Ventana de inicio de sesión -->
     <dialog id="login-dialog" class="rounded-2xl p-0 shadow-2xl backdrop:bg-black/50 w-[90vw] max-w-sm">
-    <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
-        <h3 class="text-base font-bold text-navy-900">Iniciar sesión para editar</h3>
-        <input id="login-email" type="email" required autocomplete="username" placeholder="Correo" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
-        <input id="login-pass" type="password" required autocomplete="current-password" placeholder="Contraseña" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
-        <p id="login-error" class="hidden text-xs text-rose-600 font-semibold"></p>
-        <div class="flex justify-end gap-2">
-            <button type="button" onclick="document.getElementById('login-dialog').close()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100">Cancelar</button>
-            <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-court-700">Entrar</button>
-        </div>
-    </form>
-</dialog>
+        <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
+            <h3 class="text-base font-bold text-navy-900">Iniciar sesión para editar</h3>
+            <input id="login-email" type="email" required autocomplete="username" placeholder="Correo" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
+            <input id="login-pass" type="password" required autocomplete="current-password" placeholder="Contraseña" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
+            <p id="login-error" class="hidden text-xs text-rose-600 font-semibold"></p>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="document.getElementById('login-dialog').close()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100">Cancelar</button>
+                <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-court-700">Entrar</button>
+            </div>
+        </form>
+    </dialog>
 
     <!-- Encabezado Deportivo -->
     <header class="bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex items-center gap-2">
-    <span id="auth-user" class="hidden text-xs text-slate-300 truncate max-w-[180px]"></span>
-    <button id="login-btn" type="button" onclick="openLogin()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
-        <i class="fa-solid fa-lock"></i> Iniciar sesión
-    </button>
-    <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
-        <i class="fa-solid fa-right-from-bracket"></i> Salir
-    </button>
-</div>
-
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-tennis-neon text-navy-900 flex items-center justify-center shadow-md shrink-0">
                         <i class="fa-solid fa-trophy text-2xl"></i>
@@ -113,6 +104,15 @@
                         </div>
                         <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5">Liga de Tenis Rotativa (2026)</h1>
                     </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="auth-user" class="hidden text-xs text-slate-300 truncate max-w-[180px]"></span>
+                    <button id="login-btn" type="button" onclick="openLogin()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock"></i> Iniciar sesión
+                    </button>
+                    <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i> Salir
+                    </button>
                 </div>
             </div>
 
@@ -244,6 +244,18 @@
                     </div>
                 </div>
             </div>
+            <!-- Panel de jugadores (solo editores) -->
+            <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex items-center gap-2 text-navy-900">
+                    <i class="fa-solid fa-users text-court-600"></i>
+                    <h3 class="text-base font-bold">Jugadores</h3>
+                </div>
+                <ul id="players-list" class="divide-y divide-slate-100 text-sm"></ul>
+                <form onsubmit="addPlayer(event)" class="flex gap-2">
+                    <input id="new-player-name" type="text" maxlength="30" required placeholder="Nombre del nuevo jugador" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold">Agregar</button>
+                </form>
+            </div>
         </section>
 
         <!-- ========================================================= -->
@@ -258,7 +270,7 @@
                         </div>
                         <div>
                             <h2 class="text-lg font-bold">Asistente Rápido de Partido (1 vs 1)</h2>
-                            <p class="text-xs text-slate-200">Registra un encuentro individual: suma automáticamente +2 Victoria al ganador y +1 Derrota al perdedor manteniendo el cuadre perfecto.</p>
+                            <p class="text-xs text-slate-200">Registra un encuentro individual: suma una victoria al ganador y una derrota al perdedor en la jornada elegida.</p>
                         </div>
                     </div>
                 </div>
@@ -274,7 +286,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
                             <label for="quick-winner" class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">
-                                <i class="fa-solid fa-trophy text-emerald-600 mr-1"></i> Ganador (+2 Victoria)
+                                <i class="fa-solid fa-trophy text-emerald-600 mr-1"></i> Ganador (+1 Victoria)
                             </label>
                             <select id="quick-winner" class="w-full rounded-xl border border-emerald-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                 <!-- Opciones dinámicas -->
@@ -357,8 +369,8 @@
     <!-- Lógica Completa de la Aplicación con Firebase Realtime Database -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, update, increment, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         // =========================================================================
         // 1. CONFIGURACIÓN DE FIREBASE REALTIME DATABASE Y ESTADO INICIAL (2026)
@@ -381,9 +393,9 @@
         const leagueRef = ref(db, 'liga_tenis/temporada_2026');
 
         const DEFAULT_DATES = [
-            'Dom 22-Nov', 'Sáb 28-Nov', 'Dom 29-Nov',
-            'Sáb 05-Dic', 'Dom 06-Dic', 'Sáb 12-Dic', 'Dom 13-Dic', 'Sáb 19-Dic',
-            'Dom 20-Dic', 'Sáb 26-Dic', 'Dom 27-Dic'
+            'Dom 15-Nov-2026', 'Sáb 21-Nov-2026', 'Dom 22-Nov-2026', 'Sáb 28-Nov-2026', 'Dom 29-Nov-2026',
+            'Sáb 05-Dic-2026', 'Dom 06-Dic-2026', 'Sáb 12-Dic-2026', 'Dom 13-Dic-2026', 'Sáb 19-Dic-2026',
+            'Dom 20-Dic-2026', 'Sáb 26-Dic-2026', 'Dom 27-Dic-2026'
         ];
 
         function getInitialState() {
@@ -395,9 +407,9 @@
                 ptsLoss: 1,
                 dates: [...DEFAULT_DATES],
                 players: [
-                    { id: 'p1', name: 'Rodrigo', wins: createWinsRow(0), losses: createLossesRow(0) },
-                    { id: 'p2', name: 'Gera', wins: createWinsRow(0), losses: createLossesRow(0) },
-                    { id: 'p3', name: 'Alexis', wins: createWinsRow(0), losses: createLossesRow(0) }
+                    { id: 'p1', name: 'Rodrigo', wins: createWinsRow(3), losses: createLossesRow(3) },
+                    { id: 'p2', name: 'Gera', wins: createWinsRow(3), losses: createLossesRow(3) },
+                    { id: 'p3', name: 'Alexis', wins: createWinsRow(4), losses: createLossesRow(2) }
                 ],
                 quickLogs: []
             };
@@ -408,6 +420,9 @@
         let unsubscribeDb = null;
         let chartInstance = null;
         let chartMetric = 'wins';
+        let dbIsEmpty = false;
+        let pendingRoundsRender = false;
+        const BASE = 'liga_tenis/temporada_2026';
 
         function updateSyncBadge(status, text) {
             const badge = document.getElementById('sync-status-badge');
@@ -427,95 +442,136 @@
             }
         }
 
+        function normalizeQuickLogs(raw) {
+            if (!raw) return [];
+            return Object.entries(raw)
+                .map(([id, v]) => ({ id, ...v }))
+                .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+                .slice(0, 50);
+        }
+
         function subscribeToLeagueData() {
             if (unsubscribeDb) unsubscribeDb();
-
-            unsubscribeDb = onValue(leagueRef, async (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    if (data && Array.isArray(data.players) && Array.isArray(data.dates)) {
-                        // Realtime DB omite arrays vacíos, por lo que aseguramos quickLogs como arreglo
-                        state = {
-                            ptsWin: Number(data.ptsWin ?? 2),
-                            ptsLoss: Number(data.ptsLoss ?? 1),
-                            dates: data.dates,
-                            players: data.players.map(p => ({
-                                ...p,
-                                wins: Array.isArray(p.wins) ? p.wins : Array(data.dates.length).fill(0),
-                                losses: Array.isArray(p.losses) ? p.losses : Array(data.dates.length).fill(0)
-                            })),
-                            quickLogs: Array.isArray(data.quickLogs) ? data.quickLogs : []
-                        };
-                        renderAll();
-                        updateSyncBadge('online', 'Sincronizado en tiempo real');
-                    }
-                } else {
-                    // Primera vez: poblar la base de datos con el estado inicial
-                    await saveState();
+            unsubscribeDb = onValue(leagueRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    dbIsEmpty = true;
                     renderAll();
+                    if (currentUser) seedState();
+                    return;
+                }
+                dbIsEmpty = false;
+                const data = snapshot.val();
+                if (data && Array.isArray(data.players) && Array.isArray(data.dates)) {
+                    state = {
+                        ptsWin: Number(data.ptsWin ?? 2),
+                        ptsLoss: Number(data.ptsLoss ?? 1),
+                        dates: data.dates,
+                        players: data.players.map(p => ({
+                            ...p,
+                            wins: Array.isArray(p.wins) ? p.wins : Array(data.dates.length).fill(0),
+                            losses: Array.isArray(p.losses) ? p.losses : Array(data.dates.length).fill(0)
+                        })),
+                        quickLogs: normalizeQuickLogs(data.quickLogs)
+                    };
+                    renderAll();
+                    updateSyncBadge('online', 'Sincronizado en tiempo real');
                 }
             }, (error) => {
                 console.error('Error en suscripción Realtime DB:', error);
                 updateSyncBadge('error', `Error DB: ${error.code || 'Permiso denegado'}`);
-                showToast(`Error de lectura: Revisa las reglas de Realtime Database.`, 'warning');
+                showToast('Error de lectura: revisa las reglas de Realtime Database.', 'warning');
             });
         }
 
-        async function initFirebaseSync() {
+        function initFirebaseSync() {
             if (window.location.protocol === 'file:') {
                 updateSyncBadge('error', 'Usa servidor local (HTTP)');
                 return;
             }
-
-            const connectionTimeout = setTimeout(() => {
-                if (!currentUser) {
-                    updateSyncBadge('error', 'Timeout: Bloqueado por AdBlock/Red');
-                    showToast('La conexión a Firebase tardó demasiado. Desactiva bloqueadores de anuncios.', 'warning');
-                }
-            }, 8000);
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    clearTimeout(connectionTimeout);
-                    currentUser = user;
-                    subscribeToLeagueData();
-                }
+            onAuthStateChanged(auth, async (user) => {
+                // Las sesiones anónimas antiguas no cuentan como editor
+                currentUser = (user && !user.isAnonymous) ? user : null;
+                applyAuthUI();
+                if (currentUser && dbIsEmpty) await seedState();
             });
-
-            try {
-                await signInAnonymously(auth);
-            } catch (err) {
-                clearTimeout(connectionTimeout);
-                console.error('Error inicializando autenticación:', err);
-                let msg = `Auth Error: ${err.code}`;
-                if (err.code === 'auth/operation-not-allowed') msg = 'Habilita Auth Anónima';
-                if (err.code === 'auth/unauthorized-domain') msg = 'Dominio no autorizado en Firebase';
-                updateSyncBadge('error', msg);
-                showToast(`Fallo Auth (${err.code}). Revisa la consola (F12).`, 'warning');
-            }
+            subscribeToLeagueData();
         }
 
-        async function saveState() {
+        // Escritura puntual (multi-ruta, atómica). Acepta increment() y null para borrar.
+        async function dbUpdate(changes) {
             if (!currentUser) {
-                showToast('Esperando autenticación con Firebase...', 'warning');
-                return;
+                showToast('Inicia sesión para editar.', 'warning');
+                return false;
             }
             try {
                 updateSyncBadge('saving', 'Guardando...');
-                await set(leagueRef, {
-                    ptsWin: state.ptsWin,
-                    ptsLoss: state.ptsLoss,
-                    dates: state.dates,
-                    players: state.players,
-                    quickLogs: state.quickLogs,
-                    updatedAt: new Date().toISOString()
-                });
+                const payload = { [`${BASE}/updatedAt`]: new Date().toISOString() };
+                for (const [path, value] of Object.entries(changes)) payload[`${BASE}/${path}`] = value;
+                await update(ref(db), payload);
                 updateSyncBadge('online', 'Sincronizado en tiempo real');
+                return true;
             } catch (e) {
                 console.error('Error guardando en Realtime DB:', e);
                 updateSyncBadge('error', `Error al guardar: ${e.code || 'Permiso denegado'}`);
-                showToast(`Error al guardar: Revisa las reglas de Realtime Database.`, 'warning');
+                showToast('No se pudo guardar. ¿Tu cuenta tiene permiso de edición?', 'warning');
+                return false;
             }
+        }
+
+        async function seedState() {
+            if (!currentUser) return;
+            try {
+                const s = getInitialState();
+                await set(leagueRef, {
+                    ptsWin: s.ptsWin, ptsLoss: s.ptsLoss, dates: s.dates, players: s.players,
+                    updatedAt: new Date().toISOString()
+                });
+                dbIsEmpty = false;
+            } catch (e) {
+                console.error('Error inicializando datos:', e);
+            }
+        }
+
+        function applyReadOnly() {
+            const readOnly = !currentUser;
+            document.querySelectorAll(
+                '#rounds-grid input, #pts-win-input, #pts-loss-input, #view-quick button[type="submit"], #quick-log-list button'
+            ).forEach(el => { el.disabled = readOnly; });
+        }
+
+        function applyAuthUI() {
+            const logged = !!currentUser;
+            document.getElementById('login-btn').classList.toggle('hidden', logged);
+            document.getElementById('logout-btn').classList.toggle('hidden', !logged);
+            const label = document.getElementById('auth-user');
+            label.classList.toggle('hidden', !logged);
+            label.textContent = logged ? currentUser.email : '';
+            document.querySelectorAll('[data-admin-only]').forEach(el => el.classList.toggle('hidden', !logged));
+            applyReadOnly();
+        }
+
+        function openLogin() { document.getElementById('login-dialog').showModal(); }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const errEl = document.getElementById('login-error');
+            errEl.classList.add('hidden');
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById('login-pass').value = '';
+                document.getElementById('login-dialog').close();
+                showToast('Sesión iniciada');
+            } catch (err) {
+                errEl.textContent = 'Correo o contraseña incorrectos.';
+                errEl.classList.remove('hidden');
+            }
+        }
+
+        async function doLogout() {
+            await signOut(auth);
+            showToast('Sesión cerrada');
         }
 
         // =========================================================================
@@ -561,15 +617,34 @@
         // =========================================================================
         // 3. RENDERIZADO Y ACCIONES
         // =========================================================================
+        function isEditingRounds() {
+            const el = document.activeElement;
+            return !!(el && el.tagName === 'INPUT' && el.closest('#rounds-grid'));
+        }
+
         function renderAll() {
             const stats = computeLeagueStats();
-            document.getElementById('pts-win-input').value = state.ptsWin;
-            document.getElementById('pts-loss-input').value = state.ptsLoss;
+            const winIn = document.getElementById('pts-win-input');
+            const lossIn = document.getElementById('pts-loss-input');
+            if (document.activeElement !== winIn) winIn.value = state.ptsWin;
+            if (document.activeElement !== lossIn) lossIn.value = state.ptsLoss;
             renderRankingTable(stats);
             renderChart(stats);
             renderQuickMatchForm();
-            renderRoundsView();
+            renderPlayersList();
+            if (isEditingRounds()) { pendingRoundsRender = true; } else { renderRoundsView(); }
+            applyReadOnly();
         }
+
+        document.addEventListener('focusout', () => {
+            setTimeout(() => {
+                if (pendingRoundsRender && !isEditingRounds()) {
+                    pendingRoundsRender = false;
+                    renderRoundsView();
+                    applyReadOnly();
+                }
+            }, 0);
+        });
 
         function setChartMetric(metric) {
             chartMetric = metric;
@@ -597,11 +672,8 @@
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
 
-            const playerColors = [
-                { stroke: '#15803d', fill: 'rgba(21, 128, 61, 0.12)' },
-                { stroke: '#2563eb', fill: 'rgba(37, 99, 235, 0.12)' },
-                { stroke: '#d97706', fill: 'rgba(217, 119, 6, 0.12)' }
-            ];
+            const palette = ['#15803d', '#2563eb', '#d97706', '#9333ea', '#dc2626', '#0891b2', '#4d7c0f', '#be185d'];
+            const playerColors = palette.map(c => ({ stroke: c, fill: c + '1f' }));
 
             const datasets = state.players.map((p, idx) => {
                 const color = playerColors[idx % playerColors.length];
@@ -702,12 +774,12 @@
             }).join('');
         }
 
-        function updateRoundStat(type, playerIdx, dateIdx, rawVal) {
-            const val = Math.max(0, parseInt(rawVal, 10) || 0);
-            state.players[playerIdx][type][dateIdx] = val;
-            saveState();
-            renderAll();
-            showToast(`${state.players[playerIdx].name} actualizado con éxito`);
+        async function updateRoundStat(type, playerIdx, dateIdx, rawVal) {
+            if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+            const val = Math.min(999, Math.max(0, parseInt(rawVal, 10) || 0));
+            const ok = await dbUpdate({ [`players/${playerIdx}/${type}/${dateIdx}`]: val });
+            if (ok) showToast(`${state.players[playerIdx].name} actualizado con éxito`);
+            else renderAll();
         }
 
         function renderRankingTable(stats) {
@@ -734,17 +806,27 @@
             const dateSelect = document.getElementById('quick-date');
             const winnerSelect = document.getElementById('quick-winner');
             const loserSelect = document.getElementById('quick-loser');
+            const prev = { date: dateSelect.value, winner: winnerSelect.value, loser: loserSelect.value };
 
             dateSelect.innerHTML = state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
             const playerOptions = state.players.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)}</option>`).join('');
             winnerSelect.innerHTML = playerOptions;
             loserSelect.innerHTML = playerOptions;
-            if (state.players.length > 1) loserSelect.value = '1';
+
+            if (prev.date !== '' && state.dates[prev.date] !== undefined) dateSelect.value = prev.date;
+            if (prev.winner !== '' && state.players[prev.winner]) winnerSelect.value = prev.winner;
+            if (prev.loser !== '' && state.players[prev.loser]) loserSelect.value = prev.loser;
+            else if (state.players.length > 1) loserSelect.value = '1';
 
             const logList = document.getElementById('quick-log-list');
             document.getElementById('quick-log-count').textContent = `${state.quickLogs.length} registros`;
-            logList.innerHTML = state.quickLogs.length === 0 ? `<p class="text-slate-400 italic py-2">Sin registros en esta sesión.</p>` :
-                state.quickLogs.slice(0, 8).map(i => `<div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200"><strong>${escapeHtml(i.winner)}</strong> venció a <strong>${escapeHtml(i.loser)}</strong> (${escapeHtml(i.date)})</div>`).join('');
+            logList.innerHTML = state.quickLogs.length === 0
+                ? `<p class="text-slate-400 italic py-2">Sin registros todavía.</p>`
+                : state.quickLogs.slice(0, 8).map(i => `
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                        <span><strong>${escapeHtml(i.winner)}</strong> venció a <strong>${escapeHtml(i.loser)}</strong> (${escapeHtml(i.date)})</span>
+                        ${i.winnerIdx !== undefined ? `<button type="button" data-id="${escapeHtml(i.id)}" onclick="undoQuickLog(this.dataset.id)" class="shrink-0 px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">Deshacer</button>` : ''}
+                    </div>`).join('');
         }
 
         function switchTab(tabName) {
@@ -762,16 +844,15 @@
             if (tabName === 'ranking') renderChart(computeLeagueStats());
         }
 
-        function updateScoringRules() {
-            const w = parseInt(document.getElementById('pts-win-input').value, 10);
-            const l = parseInt(document.getElementById('pts-loss-input').value, 10);
-            state.ptsWin = isNaN(w) ? 2 : w;
-            state.ptsLoss = isNaN(l) ? 1 : l;
-            saveState();
-            renderAll();
+        async function updateScoringRules() {
+            const clamp = (v, def) => isNaN(v) ? def : Math.min(10, Math.max(0, v));
+            const w = clamp(parseInt(document.getElementById('pts-win-input').value, 10), 2);
+            const l = clamp(parseInt(document.getElementById('pts-loss-input').value, 10), 1);
+            const ok = await dbUpdate({ ptsWin: w, ptsLoss: l });
+            if (!ok) renderAll();
         }
 
-        function handleQuickMatchSubmit(e) {
+        async function handleQuickMatchSubmit(e) {
             e.preventDefault();
             const dateIdx = parseInt(document.getElementById('quick-date').value, 10);
             const winnerIdx = parseInt(document.getElementById('quick-winner').value, 10);
@@ -782,19 +863,64 @@
                 return;
             }
 
-            state.players[winnerIdx].wins[dateIdx] = (Number(state.players[winnerIdx].wins[dateIdx]) || 0) + 1;
-            state.players[loserIdx].losses[dateIdx] = (Number(state.players[loserIdx].losses[dateIdx]) || 0) + 1;
+            const logId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+            const changes = {
+                [`players/${winnerIdx}/wins/${dateIdx}`]: increment(1),
+                [`players/${loserIdx}/losses/${dateIdx}`]: increment(1),
+                [`quickLogs/${logId}`]: {
+                    ts: Date.now(),
+                    date: state.dates[dateIdx],
+                    dateIdx, winnerIdx, loserIdx,
+                    winner: state.players[winnerIdx].name,
+                    loser: state.players[loserIdx].name,
+                    time: new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+                }
+            };
+            // Mantener solo los 50 registros más recientes
+            state.quickLogs.slice(49).forEach(l => { changes[`quickLogs/${l.id}`] = null; });
 
-            state.quickLogs.unshift({
-                date: state.dates[dateIdx],
-                winner: state.players[winnerIdx].name,
-                loser: state.players[loserIdx].name,
-                time: new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+            const ok = await dbUpdate(changes);
+            if (ok) showToast('Partido registrado correctamente');
+        }
+
+        async function undoQuickLog(id) {
+            const log = state.quickLogs.find(l => l.id === id);
+            if (!log || log.winnerIdx === undefined) return;
+            if (!confirm(`¿Deshacer: ${log.winner} venció a ${log.loser} (${log.date})?`)) return;
+            const ok = await dbUpdate({
+                [`players/${log.winnerIdx}/wins/${log.dateIdx}`]: increment(-1),
+                [`players/${log.loserIdx}/losses/${log.dateIdx}`]: increment(-1),
+                [`quickLogs/${id}`]: null
             });
+            showToast(ok ? 'Partido deshecho' : 'No se pudo deshacer (¿editaste esa jornada a mano?)', ok ? 'success' : 'warning');
+        }
 
-            saveState();
-            renderAll();
-            showToast('Partido registrado correctamente');
+        function renderPlayersList() {
+            const list = document.getElementById('players-list');
+            if (!list) return;
+            list.innerHTML = state.players.map((p, i) => `
+                <li class="py-2 flex items-center justify-between gap-2">
+                    <span class="font-semibold text-navy-900">${escapeHtml(p.name)}</span>
+                    <button type="button" onclick="renamePlayer(${i})" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">Renombrar</button>
+                </li>`).join('');
+        }
+
+        async function renamePlayer(idx) {
+            const current = state.players[idx].name;
+            const name = (prompt('Nuevo nombre:', current) || '').trim().slice(0, 30);
+            if (!name || name === current) return;
+            await dbUpdate({ [`players/${idx}/name`]: name });
+        }
+
+        async function addPlayer(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-player-name');
+            const name = input.value.trim().slice(0, 30);
+            if (!name) return;
+            const n = state.players.length;
+            const zeros = () => Array(state.dates.length).fill(0);
+            const ok = await dbUpdate({ [`players/${n}`]: { id: 'p' + (n + 1), name, wins: zeros(), losses: zeros() } });
+            if (ok) { input.value = ''; showToast(`${name} agregado`); }
         }
 
         function showToast(message, type = 'success') {
@@ -814,8 +940,14 @@
         window.setChartMetric = setChartMetric;
         window.updateScoringRules = updateScoringRules;
         window.handleQuickMatchSubmit = handleQuickMatchSubmit;
-        window.renderRoundsView = renderRoundsView;
+        window.renderRoundsView = () => { renderRoundsView(); applyReadOnly(); };
         window.updateRoundStat = updateRoundStat;
+        window.undoQuickLog = undoQuickLog;
+        window.addPlayer = addPlayer;
+        window.renamePlayer = renamePlayer;
+        window.openLogin = openLogin;
+        window.handleLogin = handleLogin;
+        window.doLogout = doLogout;
 
         window.addEventListener('DOMContentLoaded', () => {
             renderAll();
