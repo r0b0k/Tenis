@@ -130,9 +130,9 @@
                         </h2>
                         <p class="text-xs text-slate-300">Ordenada automáticamente por Índice de Desempate en tiempo real</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-court-700 text-white">
-                        <span class="w-2 h-2 rounded-full bg-tennis-neon animate-pulse"></span>
-                        Sincronizado con Registro
+                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-600 text-white">
+                        <span class="w-2 h-2 rounded-full bg-amber-200 animate-pulse"></span>
+                        Conectando a nube...
                     </span>
                 </div>
 
@@ -326,18 +326,39 @@
     <footer class="bg-white border-t border-slate-200 mt-12 py-5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <p><strong>Liga de Tenis Rotativa (2026)</strong> • Basado exactamente en la lógica de <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">Registro_Tenis_Fines_de_Semana_2026-v3.xlsx</code></p>
-            <p class="flex items-center gap-1.5 text-court-700 font-medium">
-                <i class="fa-solid fa-floppy-disk"></i> Guardado automático activo en navegador
+            <p id="footer-sync-status" class="flex items-center gap-1.5 text-court-700 font-medium">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Sincronización en la nube activa (Firebase)
             </p>
         </div>
     </footer>
 
-    <!-- Lógica Completa de la Aplicación -->
-    <script>
+    <!-- Lógica Completa de la Aplicación con Firebase Firestore -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         // =========================================================================
-        // 1. ESTADO INICIAL EXACTAMENTE IGUAL AL ARCHIVO EXCEL (2026)
+        // 1. CONFIGURACIÓN DE FIREBASE Y ESTADO INICIAL (2026)
         // =========================================================================
-        const STORAGE_KEY = 'liga_tenis_rotativa_2026_v3';
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_vZXquA24kJ410JMBCmp5jPKkE4heM5I",
+            authDomain: "tenis-rotativo.firebaseapp.com",
+            databaseURL: "https://tenis-rotativo-default-rtdb.firebaseio.com",
+            projectId: "tenis-rotativo",
+            storageBucket: "tenis-rotativo.firebasestorage.app",
+            messagingSenderId: "1029197173515",
+            appId: "1:1029197173515:web:5bdbb728fb4c181b2d080e",
+            measurementId: "G-WW6TF37JC0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tenis-rotativo-2026';
+
+        // Ruta pública compartida para que todos los amigos lean y editen la misma liga
+        const leagueDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'liga_tenis', 'temporada_2026');
 
         const DEFAULT_DATES = [
             'Dom 15-Nov', 'Sáb 21-Nov', 'Dom 22-Nov', 'Sáb 28-Nov', 'Dom 29-Nov',
@@ -377,30 +398,89 @@
             };
         }
 
-        let state = loadState();
+        let state = getInitialState();
+        let currentUser = null;
         let chartInstance = null;
         let chartMetric = 'wins';
 
-        function loadState() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && Array.isArray(parsed.players) && Array.isArray(parsed.dates)) {
-                        return parsed;
-                    }
-                }
-            } catch (e) {
-                console.error('Error leyendo localStorage:', e);
+        function updateSyncBadge(status, text) {
+            const badge = document.getElementById('sync-status-badge');
+            const footer = document.getElementById('footer-sync-status');
+            if (!badge) return;
+
+            if (status === 'online') {
+                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-court-700 text-white';
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-tennis-neon animate-pulse"></span> ${escapeHtml(text)}`;
+                if (footer) footer.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${escapeHtml(text)}`;
+            } else if (status === 'saving') {
+                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-700 text-white';
+                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Guardando en nube...`;
+            } else {
+                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-700 text-white';
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(text)}`;
             }
-            return getInitialState();
         }
 
-        function saveState() {
+        async function initFirebaseSync() {
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                // Autenticación obligatoria antes de consultar Firestore
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = cred.user;
+                } else {
+                    const cred = await signInAnonymously(auth);
+                    currentUser = cred.user;
+                }
+
+                // Escucha en tiempo real del documento compartido de la liga
+                onSnapshot(leagueDocRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data && Array.isArray(data.players) && Array.isArray(data.dates)) {
+                            state = {
+                                ptsWin: Number(data.ptsWin ?? 2),
+                                ptsLoss: Number(data.ptsLoss ?? 1),
+                                dates: data.dates,
+                                players: data.players,
+                                quickLogs: Array.isArray(data.quickLogs) ? data.quickLogs : []
+                            };
+                            renderAll();
+                            updateSyncBadge('online', 'Sincronizado en tiempo real');
+                        }
+                    } else {
+                        // Si es la primera vez que se abre, inicializa la base de datos en Firestore con los datos del Excel
+                        await saveState();
+                        renderAll();
+                    }
+                }, (error) => {
+                    console.error('Error en suscripción Firestore:', error);
+                    updateSyncBadge('error', 'Error de lectura en nube');
+                    showToast('Error al sincronizar con la nube. Verifica las reglas de Firestore.', 'warning');
+                });
+            } catch (err) {
+                console.error('Error inicializando autenticación/Firebase:', err);
+                updateSyncBadge('error', 'Sin conexión a nube');
+                showToast('No se pudo conectar con Firebase. Revisa la configuración.', 'warning');
+            }
+        }
+
+        async function saveState() {
+            if (!currentUser) return;
+            try {
+                updateSyncBadge('saving', 'Guardando...');
+                await setDoc(leagueDocRef, {
+                    ptsWin: state.ptsWin,
+                    ptsLoss: state.ptsLoss,
+                    dates: state.dates,
+                    players: state.players,
+                    quickLogs: state.quickLogs,
+                    updatedAt: new Date().toISOString()
+                });
+                updateSyncBadge('online', 'Sincronizado en tiempo real');
             } catch (e) {
-                console.error('Error guardando en localStorage:', e);
+                console.error('Error guardando en Firestore:', e);
+                updateSyncBadge('error', 'Error al guardar');
+                showToast('Error al guardar en la base de datos.', 'warning');
             }
         }
 
@@ -841,8 +921,17 @@
                 .replace(/'/g, '&#039;');
         }
 
+        // Exponer funciones al ámbito global window para los atributos onclick/onchange del HTML
+        window.switchTab = switchTab;
+        window.setChartMetric = setChartMetric;
+        window.updateScoringRules = updateScoringRules;
+        window.handleQuickMatchSubmit = handleQuickMatchSubmit;
+        window.renderRoundsView = renderRoundsView;
+        window.updateRoundStat = updateRoundStat;
+
         window.addEventListener('DOMContentLoaded', () => {
             renderAll();
+            initFirebaseSync();
         });
     </script>
 </body>
