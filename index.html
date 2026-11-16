@@ -92,6 +92,16 @@
     <header class="bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center gap-2">
+    <span id="auth-user" class="hidden text-xs text-slate-300 truncate max-w-[180px]"></span>
+    <button id="login-btn" type="button" onclick="openLogin()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
+        <i class="fa-solid fa-lock"></i> Iniciar sesión
+    </button>
+    <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5">
+        <i class="fa-solid fa-right-from-bracket"></i> Salir
+    </button>
+</div>
+
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-tennis-neon text-navy-900 flex items-center justify-center shadow-md shrink-0">
                         <i class="fa-solid fa-trophy text-2xl"></i>
