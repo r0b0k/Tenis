@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎾%3C/text%3E%3C/svg%3E">
     <title>Liga de Tenis Rotativa (2026) - Ranking y Registro</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
     <!-- Font Awesome para iconografía deportiva -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js para gráficos de rendimiento -->
@@ -23,24 +24,9 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        court: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        },
-                        navy: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#090d16',
-                        },
-                        tennis: {
-                            ball: '#d9f99d',
-                            neon: '#bef264',
-                        }
+                        court: { 50:'#fbf1e8', 100:'#f6dfcb', 200:'#efc6a6', 500:'#d9743f', 600:'#c2562b', 700:'#a8431f', 800:'#8a3519', 900:'#6b2a14' },
+                        navy: { 800:'#4a2e1b', 900:'#33200f', 950:'#1f1209' },
+                        tennis: { ball:'#f3f0a8', neon:'#e3ec4b' }
                     }
                 }
             }
@@ -69,6 +55,31 @@
         .table-scroll::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        /* ===== Tema retro: tenis en arcilla ===== */
+        body {
+            background-color: #f1e4d0;
+            background-image: radial-gradient(rgba(160,82,45,.10) 1px, transparent 1.4px), radial-gradient(rgba(255,255,255,.35) 1px, transparent 1.4px);
+            background-size: 22px 22px, 37px 37px;
+            background-position: 0 0, 11px 11px;
+            color: #33200f;
+        }
+        h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; letter-spacing: .01em; }
+        body .bg-white { background-color: #fffaf0; }
+        body .bg-slate-50 { background-color: #fbf3e6; }
+        body .bg-slate-100 { background-color: #f3e6d2; }
+        body .border-slate-100, body .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #f0e2cc; }
+        body .border-slate-200 { border-color: #e7d3b9; }
+        body .border-slate-300 { border-color: #d9bf9d; }
+        dialog { background: #fffaf0; color: #33200f; }
+        select:disabled, input:disabled { opacity: .55; cursor: not-allowed; }
+        .clay-card {
+            background-color: #c0562b;
+            background-image: radial-gradient(rgba(255,255,255,.10) 1.2px, transparent 1.6px), radial-gradient(rgba(60,20,5,.18) 1.2px, transparent 1.6px), linear-gradient(135deg, #cf6a3b, #b34a22);
+            background-size: 18px 18px, 29px 29px, 100% 100%;
+            border: 3px solid #fffaf0;
+            box-shadow: 0 0 0 3px #c0562b, 0 10px 24px rgba(90,35,10,.25);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
@@ -90,8 +101,9 @@
     </dialog>
 
     <!-- Encabezado Deportivo -->
-    <header class="bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+    <header class="relative overflow-hidden bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
+        <div aria-hidden="true" class="absolute inset-0 pointer-events-none opacity-[.14]" style="background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20260%20120%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%272%27%3E%3Crect%20x%3D%275%27%20y%3D%275%27%20width%3D%27250%27%20height%3D%27110%27/%3E%3Crect%20x%3D%275%27%20y%3D%2720%27%20width%3D%27250%27%20height%3D%2780%27/%3E%3Cline%20x1%3D%27130%27%20y1%3D%275%27%20x2%3D%27130%27%20y2%3D%27115%27/%3E%3Cline%20x1%3D%2765%27%20y1%3D%2720%27%20x2%3D%2765%27%20y2%3D%27100%27/%3E%3Cline%20x1%3D%27195%27%20y1%3D%2720%27%20x2%3D%27195%27%20y2%3D%27100%27/%3E%3Cline%20x1%3D%2765%27%20y1%3D%2760%27%20x2%3D%27195%27%20y2%3D%2760%27/%3E%3C/svg%3E);background-size:540px auto;background-repeat:no-repeat;background-position:right -30px center"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-tennis-neon text-navy-900 flex items-center justify-center shadow-md shrink-0">
@@ -102,7 +114,7 @@
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-court-600/40 text-tennis-ball border border-tennis-neon/30">Temporada 2026</span>
                             <span class="text-xs text-slate-300 hidden sm:inline">• Control Fines de Semana</span>
                         </div>
-                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5">Liga de Tenis Rotativa (2026)</h1>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5 inline-flex items-center gap-2"><svg viewBox="0 0 26 26" class="w-7 h-7 shrink-0" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#e3ec4b" stroke="#fffaf0" stroke-width="1.5"/><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#fffaf0" stroke-width="1.8" stroke-linecap="round"/></svg> Liga de Tenis Rotativa (2026)</h1>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -184,22 +196,19 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+                <div class="lg:col-span-2 clay-card rounded-2xl p-6 flex flex-col justify-between">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div>
-                            <h3 class="text-base font-bold text-navy-900">Rendimiento por Jornada</h3>
-                            <p id="chart-subtitle" class="text-xs text-slate-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chart-line text-tennis-neon"></i> Rendimiento por Jornada</h3>
+                            <p id="chart-subtitle" class="text-xs text-orange-100">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/25 text-orange-50 text-xs font-semibold"></div>
                         </div>
-                        <div class="inline-flex rounded-xl bg-slate-100 p-1 self-start sm:self-auto">
-                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition">
-                                Victorias
-                            </button>
-                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition">
-                                Puntos
-                            </button>
+                        <div class="inline-flex rounded-xl bg-black/20 p-1 self-start sm:self-auto">
+                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition"><i class="fa-solid fa-trophy mr-1"></i>Victorias</button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-orange-100 hover:text-white transition"><i class="fa-solid fa-star mr-1"></i>Puntos</button>
                         </div>
                     </div>
-                    <div class="relative h-64 w-full">
+                    <div class="relative h-72 w-full">
                         <canvas id="rankingChart"></canvas>
                     </div>
                 </div>
@@ -306,9 +315,9 @@
                     <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
                         <span class="text-xs text-slate-500 flex items-center gap-1.5">
                             <i class="fa-solid fa-circle-check text-court-600"></i>
-                            Garantiza cuadre exacto (Dif: 0) en la jornada seleccionada
+                            <span id="quick-hint">Garantiza cuadre exacto (Dif: 0) en la jornada seleccionada</span>
                         </span>
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-court-700 hover:bg-court-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-court-700 hover:bg-court-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition disabled:bg-slate-300 disabled:hover:bg-slate-300 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2">
                             <i class="fa-solid fa-plus-circle"></i>
                             <span>Registrar Resultado del Partido</span>
                         </button>
@@ -347,6 +356,21 @@
                     </select>
                 </div>
             </div>
+
+            <!-- Agregar nueva jornada (solo editores) -->
+            <form id="round-add-form" data-admin-only onsubmit="addRound(event)" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-court-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-calendar-plus"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold text-navy-900">Agregar nueva jornada</h3>
+                        <p class="text-xs text-slate-500">Se crea para todos los jugadores con 0 victorias y 0 derrotas, y aparece al instante.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input id="new-round-date" type="date" required class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-plus"></i> Agregar jornada</button>
+                </div>
+            </form>
 
             <!-- Grilla de Tarjetas por Jornada -->
             <div id="rounds-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -535,8 +559,10 @@
         function applyReadOnly() {
             const readOnly = !currentUser;
             document.querySelectorAll(
-                '#rounds-grid input, #pts-win-input, #pts-loss-input, #view-quick button[type="submit"], #quick-log-list button'
+                '#rounds-grid input, #pts-win-input, #pts-loss-input, #quick-date, #quick-winner, #quick-loser, #view-quick button[type="submit"], #quick-log-list button'
             ).forEach(el => { el.disabled = readOnly; });
+            const hint = document.getElementById('quick-hint');
+            if (hint) hint.textContent = readOnly ? 'Inicia sesión para registrar partidos' : 'Garantiza cuadre exacto (Dif: 0) en la jornada seleccionada';
         }
 
         function applyAuthUI() {
@@ -654,14 +680,25 @@
 
             if (metric === 'wins') {
                 winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
-                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-orange-100 hover:text-white transition';
                 subtitle.textContent = 'Evolución de victorias obtenidas por cada jugador a lo largo de las fechas';
             } else {
                 pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
-                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-orange-100 hover:text-white transition';
                 subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
             }
             renderChart(computeLeagueStats());
+        }
+
+        const BALL_CACHE = {};
+        function ballImage(color) {
+            if (BALL_CACHE[color]) return BALL_CACHE[color];
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="#e3ec4b" stroke="${color}" stroke-width="3"/><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#fffaf0" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+            const img = new Image(26, 26);
+            img.onload = () => { if (chartInstance) chartInstance.update('none'); };
+            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            BALL_CACHE[color] = img;
+            return img;
         }
 
         function renderChart(stats) {
@@ -671,34 +708,39 @@
             const labels = state.dates;
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
+            const cream = '#fff3e0';
 
-            const palette = ['#15803d', '#2563eb', '#d97706', '#9333ea', '#dc2626', '#0891b2', '#4d7c0f', '#be185d'];
-            const playerColors = palette.map(c => ({ stroke: c, fill: c + '1f' }));
+            // Colores pensados para contrastar sobre la arcilla
+            const palette = ['#fffaf0', '#2b1a0f', '#7fd1ae', '#8ec5ff', '#ffd166', '#f4a6c0', '#c9b6ff', '#ffffff'];
+
+            const lead = stats && stats.rankedPlayers && stats.rankedPlayers[0];
+            const chip = document.getElementById('chart-leader');
+            if (chip && lead) chip.innerHTML = `<i class="fa-solid fa-crown text-tennis-neon"></i> Líder: <strong>${escapeHtml(lead.name)}</strong> · ${lead.totalPoints} pts`;
 
             const datasets = state.players.map((p, idx) => {
-                const color = playerColors[idx % playerColors.length];
+                const color = palette[idx % palette.length];
+                const img = ballImage(color);
                 const seriesData = state.dates.map((_, dIdx) => {
                     const w = Number(p.wins[dIdx]) || 0;
                     const l = Number(p.losses[dIdx]) || 0;
                     return chartMetric === 'wins' ? w : (w * ptsWin) + (l * ptsLoss);
                 });
-
                 return {
                     label: p.name,
                     data: seriesData,
-                    borderColor: color.stroke,
-                    backgroundColor: color.fill,
+                    borderColor: color,
+                    backgroundColor: color,
                     borderWidth: 3,
-                    pointBackgroundColor: color.stroke,
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 1.5,
-                    pointRadius: 4,
+                    pointStyle: img.complete ? img : 'circle',
+                    pointRadius: 9,
+                    pointHoverRadius: 11,
                     fill: false,
-                    tension: 0.25
+                    tension: 0.3
                 };
             });
 
             if (chartInstance) chartInstance.destroy();
+            Chart.defaults.font.family = 'Inter';
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -707,10 +749,27 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
-                    plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', weight: '600', size: 12 }, usePointStyle: true } } },
+                    plugins: {
+                        legend: { position: 'top', labels: { color: cream, font: { weight: '700', size: 12 }, usePointStyle: true } },
+                        tooltip: {
+                            backgroundColor: '#2e1c10', titleColor: '#e3ec4b', bodyColor: '#fffaf0',
+                            borderColor: '#fffaf0', borderWidth: 1, padding: 10,
+                            titleFont: { family: 'Playfair Display', weight: '700', size: 13 }
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0 } },
-                        x: { grid: { display: false } }
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, color: cream },
+                            grid: { color: 'rgba(255,250,240,.45)', lineWidth: 1.5 },
+                            border: { color: '#fffaf0', width: 2 },
+                            title: { display: true, text: chartMetric === 'wins' ? 'Victorias' : 'Puntos', color: cream, font: { weight: '700' } }
+                        },
+                        x: {
+                            ticks: { color: cream, maxRotation: 60 },
+                            grid: { color: 'rgba(255,250,240,.22)' },
+                            border: { color: '#fffaf0', width: 2 }
+                        }
                     }
                 }
             });
@@ -782,13 +841,20 @@
             else renderAll();
         }
 
+        function posIcon(pos) {
+            if (pos === 1) return '<i class="fa-solid fa-trophy text-amber-500 mr-1"></i>1°';
+            if (pos === 2) return '<i class="fa-solid fa-medal text-slate-400 mr-1"></i>2°';
+            if (pos === 3) return '<i class="fa-solid fa-medal text-orange-700 mr-1"></i>3°';
+            return pos + '°';
+        }
+
         function renderRankingTable(stats) {
             const tbody = document.getElementById('ranking-tbody');
             tbody.innerHTML = stats.rankedPlayers.map((p, index) => {
                 const pos = index + 1;
                 return `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="py-3.5 px-4 text-center font-bold text-xs">${pos}°</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-xs">${posIcon(pos)}</td>
                         <td class="py-3.5 px-4 font-bold text-navy-900 text-base">${escapeHtml(p.name)}</td>
                         <td class="py-3.5 px-4 text-center bg-court-50/60 font-black text-sm text-court-800">${p.totalPoints}</td>
                         <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.pj}</td>
@@ -905,6 +971,37 @@
                 </li>`).join('');
         }
 
+        const DAY_ABBR = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const MON_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        function labelFromISO(iso) {
+            const [y, m, d] = iso.split('-').map(Number);
+            const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+            return `${DAY_ABBR[dow]} ${String(d).padStart(2, '0')}-${MON_ABBR[m - 1]}-${y}`;
+        }
+
+        async function addRound(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-round-date');
+            if (!input.value) return;
+            const label = labelFromISO(input.value);
+            if (state.dates.includes(label)) {
+                showToast('Esa jornada ya existe.', 'warning');
+                return;
+            }
+            const n = state.dates.length;
+            const changes = { [`dates/${n}`]: label };
+            state.players.forEach((_, i) => {
+                changes[`players/${i}/wins/${n}`] = 0;
+                changes[`players/${i}/losses/${n}`] = 0;
+            });
+            const ok = await dbUpdate(changes);
+            if (ok) {
+                input.value = '';
+                showToast(`Jornada ${label} agregada`);
+            }
+        }
+
         async function renamePlayer(idx) {
             const current = state.players[idx].name;
             const name = (prompt('Nuevo nombre:', current) || '').trim().slice(0, 30);
@@ -948,6 +1045,7 @@
         window.openLogin = openLogin;
         window.handleLogin = handleLogin;
         window.doLogout = doLogout;
+        window.addRound = addRound;
 
         window.addEventListener('DOMContentLoaded', () => {
             renderAll();
