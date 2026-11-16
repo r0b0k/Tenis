@@ -1,4 +1,338 @@
-<!-- Lógica Completa de la Aplicación con Firebase Firestore -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga de Tenis Rotativa (2026) - Ranking y Registro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconografía deportiva -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos de rendimiento -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        court: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        },
+                        tennis: {
+                            ball: '#d9f99d',
+                            neon: '#bef264',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            opacity: 1;
+        }
+        .table-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
+
+    <!-- Notificación Toast Flotante -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Encabezado Deportivo -->
+    <header class="bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-tennis-neon text-navy-900 flex items-center justify-center shadow-md shrink-0">
+                        <i class="fa-solid fa-trophy text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-court-600/40 text-tennis-ball border border-tennis-neon/30">Temporada 2026</span>
+                            <span class="text-xs text-slate-300 hidden sm:inline">• Control Fines de Semana</span>
+                        </div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5">Liga de Tenis Rotativa (2026)</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Navegación por Pestañas -->
+            <nav class="flex gap-2 mt-6 overflow-x-auto pb-1">
+                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-tennis-neon text-navy-900 shadow-sm">
+                    <i class="fa-solid fa-ranking-star"></i>
+                    <span>1. Ranking General</span>
+                </button>
+                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>2. Registro Rápido (1 vs 1)</span>
+                </button>
+                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>3. Resultados por Jornada</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ========================================================= -->
+        <!-- PESTAÑA 1: RANKING GENERAL (TIEMPO REAL)                  -->
+        <!-- ========================================================= -->
+        <section id="view-ranking" class="space-y-6">
+            
+            <!-- Tabla Principal de Ranking -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 py-4 bg-navy-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-medal text-tennis-neon"></i>
+                            Tabla General de Posiciones
+                        </h2>
+                        <p class="text-xs text-slate-300">Ordenada automáticamente por Índice de Desempate en tiempo real</p>
+                    </div>
+                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-600 text-white">
+                        <span class="w-2 h-2 rounded-full bg-amber-200 animate-pulse"></span>
+                        Conectando a nube...
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto table-scroll">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                <th class="py-3.5 px-4 text-center w-16">Pos.</th>
+                                <th class="py-3.5 px-4">Jugador</th>
+                                <th class="py-3.5 px-4 text-center bg-court-50/70 text-court-900">Puntos Totales</th>
+                                <th class="py-3.5 px-4 text-center">PJ</th>
+                                <th class="py-3.5 px-4 text-center text-emerald-700">Victorias</th>
+                                <th class="py-3.5 px-4 text-center text-rose-700">Derrotas</th>
+                                <th class="py-3.5 px-4 text-center">% Victorias</th>
+                                <th class="py-3.5 px-4 text-center">% Efectividad Pts</th>
+                                <th class="py-3.5 px-4 text-right">Índice Desempate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Renderizado dinámico por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sección Inferior: Gráfico de Rendimiento por Jornada + Reglas Configurables -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-navy-900">Rendimiento por Jornada</h3>
+                            <p id="chart-subtitle" class="text-xs text-slate-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                        </div>
+                        <div class="inline-flex rounded-xl bg-slate-100 p-1 self-start sm:self-auto">
+                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition">
+                                Victorias
+                            </button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition">
+                                Puntos
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="rankingChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Panel de Reglas y Sistema de Puntuación Configurable (1 columna) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between space-y-5">
+                    <div>
+                        <div class="flex items-center gap-2 text-navy-900 mb-1">
+                            <i class="fa-solid fa-sliders text-court-600"></i>
+                            <h3 class="text-base font-bold">Sistema de Puntuación</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Valores configurables (por defecto idénticos a la celda <code class="bg-slate-100 px-1 rounded">Ranking!$C$12</code> del Excel).</p>
+
+                        <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+                            <div class="flex items-center justify-between">
+                                <label for="pts-win-input" class="text-xs font-bold text-slate-700">Puntos por Victoria:</label>
+                                <div class="flex items-center gap-2">
+                                    <input id="pts-win-input" type="number" min="0" max="10" step="1" onchange="updateScoringRules()" class="w-16 text-center font-extrabold text-court-800 bg-white border border-slate-300 rounded-lg py-1 text-sm focus:ring-2 focus:ring-court-500 focus:outline-none">
+                                    <span class="text-xs text-slate-500 font-medium">pts</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label for="pts-loss-input" class="text-xs font-bold text-slate-700">Puntos por Derrota:</label>
+                                <div class="flex items-center gap-2">
+                                    <input id="pts-loss-input" type="number" min="0" max="10" step="1" onchange="updateScoringRules()" class="w-16 text-center font-extrabold text-slate-700 bg-white border border-slate-300 rounded-lg py-1 text-sm focus:ring-2 focus:ring-court-500 focus:outline-none">
+                                    <span class="text-xs text-slate-500 font-medium">pt</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-court-50 border border-court-200 rounded-xl p-4 text-xs text-court-900 space-y-2">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-scale-balanced text-court-700"></i>
+                            <span>Criterio de Desempate Oficial</span>
+                        </div>
+                        <p class="leading-relaxed text-court-800">
+                            1. Mayor cantidad de <strong>Puntos Totales</strong>.<br>
+                            2. Mayor cantidad de <strong>Victorias</strong> (<code class="bg-white/80 px-1 rounded">+0.001 × Vic</code>).<br>
+                            3. Orden inicial de inscripción en la liga.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- PESTAÑA 2: REGISTRO RÁPIDO DE PARTIDO (1 VS 1)            -->
+        <!-- ========================================================= -->
+        <section id="view-quick" class="hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 py-5 bg-gradient-to-r from-court-800 to-navy-900 text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-neon text-navy-900 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-bolt text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold">Asistente Rápido de Partido (1 vs 1)</h2>
+                            <p class="text-xs text-slate-200">Registra un encuentro individual: suma automáticamente +1 Victoria al ganador y +1 Derrota al perdedor manteniendo el cuadre perfecto.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form onsubmit="handleQuickMatchSubmit(event)" class="p-6 space-y-5">
+                    <div>
+                        <label for="quick-date" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">1. Selecciona la Jornada / Fecha</label>
+                        <select id="quick-date" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
+                            <!-- Opciones dinámicas -->
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+                            <label for="quick-winner" class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">
+                                <i class="fa-solid fa-trophy text-emerald-600 mr-1"></i> Ganador (+1 Victoria)
+                            </label>
+                            <select id="quick-winner" class="w-full rounded-xl border border-emerald-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                <!-- Opciones dinámicas -->
+                            </select>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200">
+                            <label for="quick-loser" class="block text-xs font-bold uppercase tracking-wider text-rose-800 mb-2">
+                                <i class="fa-solid fa-xmark text-rose-600 mr-1"></i> Perdedor (+1 Derrota)
+                            </label>
+                            <select id="quick-loser" class="w-full rounded-xl border border-rose-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                                <!-- Opciones dinámicas -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+                        <span class="text-xs text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-court-600"></i>
+                            Garantiza cuadre exacto (Dif: 0) en la jornada seleccionada
+                        </span>
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-court-700 hover:bg-court-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>Registrar Resultado del Partido</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Historial Reciente de Partidos Rápidos de la Sesión -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-navy-900">Últimos partidos anotados desde el Asistente</h3>
+                    <span id="quick-log-count" class="text-xs font-semibold text-slate-500">0 registros</span>
+                </div>
+                <div id="quick-log-list" class="space-y-2 text-xs text-slate-600">
+                    <p class="text-slate-400 italic py-2">Aún no has registrado partidos individuales en esta sesión.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- PESTAÑA 3: RESULTADOS POR JORNADA (EDITABLE)              -->
+        <!-- ========================================================= -->
+        <section id="view-rounds" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-navy-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-court-600"></i>
+                        Resultados Editables por Jornada
+                    </h2>
+                    <p class="text-xs text-slate-500">Edita directamente las victorias y derrotas de cada jugador por fecha. Los puntos, el cuadre y el ranking se actualizan al instante.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="round-filter" class="text-xs font-bold text-slate-600 whitespace-nowrap">Filtrar fecha:</label>
+                    <select id="round-filter" onchange="renderRoundsView()" class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
+                        <option value="all">Todas las jornadas (13)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grilla de Tarjetas por Jornada -->
+            <div id="rounds-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Renderizado dinámico por JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <p><strong>Liga de Tenis Rotativa (2026)</strong> • Basado exactamente en la lógica de <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">Registro_Tenis_Fines_de_Semana_2026-v3.xlsx</code></p>
+            <p id="footer-sync-status" class="flex items-center gap-1.5 text-court-700 font-medium">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Sincronización en la nube activa (Firebase)
+            </p>
+        </div>
+    </footer>
+
+    <!-- Lógica Completa de la Aplicación con Firebase Firestore -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -21,7 +355,7 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'tenis-rotativo-2026';
 
-        // Ruta pública compartida para que todos los jugadores lean y editen la misma liga
+        // Ruta pública compartida para que todos los amigos lean y editen la misma liga
         const leagueDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'liga_tenis', 'temporada_2026');
 
         const DEFAULT_DATES = [
@@ -39,9 +373,24 @@
                 ptsLoss: 1,
                 dates: [...DEFAULT_DATES],
                 players: [
-                    { id: 'p1', name: 'Rodrigo', wins: createWinsRow(3), losses: createLossesRow(3) },
-                    { id: 'p2', name: 'Gera', wins: createWinsRow(3), losses: createLossesRow(3) },
-                    { id: 'p3', name: 'Alexis', wins: createWinsRow(4), losses: createLossesRow(2) }
+                    {
+                        id: 'p1',
+                        name: 'Rodrigo',
+                        wins: createWinsRow(3),
+                        losses: createLossesRow(3)
+                    },
+                    {
+                        id: 'p2',
+                        name: 'Gera',
+                        wins: createWinsRow(3),
+                        losses: createLossesRow(3)
+                    },
+                    {
+                        id: 'p3',
+                        name: 'Alexis',
+                        wins: createWinsRow(4),
+                        losses: createLossesRow(2)
+                    }
                 ],
                 quickLogs: []
             };
@@ -89,7 +438,7 @@
                         updateSyncBadge('online', 'Sincronizado en tiempo real');
                     }
                 } else {
-                    // Documento no existe aún: lo creamos con el estado inicial
+                    // Si es la primera vez que se abre, inicializa la base de datos en Firestore con los datos del Excel
                     await saveState();
                     renderAll();
                 }
@@ -101,14 +450,12 @@
         }
 
         async function initFirebaseSync() {
-            // Advertencia si se abre como archivo local (file://)
             if (window.location.protocol === 'file:') {
                 updateSyncBadge('error', 'Error: Abre usando servidor local (HTTP)');
-                showToast('Firebase Auth no funciona abriendo el HTML directamente (file://). Usa Live Server o hosting.', 'warning');
+                showToast('Firebase Auth no funciona abriendo el HTML directamente (file://). Usa Live Server o GitHub Pages.', 'warning');
                 return;
             }
 
-            // Escuchar el estado de autenticación antes de tocar Firestore
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
@@ -124,11 +471,14 @@
                 }
             } catch (err) {
                 console.error('Error inicializando autenticación:', err);
-                const msg = err.code === 'auth/operation-not-allowed' 
-                    ? 'Habilita Auth Anónima en Firebase' 
-                    : `Error Auth: ${err.code || err.message}`;
+                let msg = `Error Auth: ${err.code || err.message}`;
+                if (err.code === 'auth/operation-not-allowed') {
+                    msg = 'Habilita Auth Anónima en Firebase';
+                } else if (err.code === 'auth/unauthorized-domain') {
+                    msg = 'Agrega este dominio en Firebase Auth';
+                }
                 updateSyncBadge('error', msg);
-                showToast(`Fallo de conexión (${err.code}). Verifica Firebase Console.`, 'warning');
+                showToast(`Fallo de conexión (${err.code}). Revisa Firebase Console.`, 'warning');
             }
         }
 
@@ -154,3 +504,456 @@
                 showToast(`Error al guardar (${e.code}): Revisa reglas de escritura.`, 'warning');
             }
         }
+
+        // =========================================================================
+        // 2. MOTOR DE CÁLCULO (FÓRMULAS EXACTAS DEL EXCEL)
+        // =========================================================================
+        function computeLeagueStats() {
+            const ptsWin = Number(state.ptsWin) || 0;
+            const ptsLoss = Number(state.ptsLoss) || 0;
+
+            const playerStats = state.players.map((player, initialIdx) => {
+                const totalWins = player.wins.reduce((acc, v) => acc + (Number(v) || 0), 0);
+                const totalLosses = player.losses.reduce((acc, v) => acc + (Number(v) || 0), 0);
+                const pj = totalWins + totalLosses;
+                const totalPoints = (totalWins * ptsWin) + (totalLosses * ptsLoss);
+
+                const winPct = pj > 0 ? (totalWins / pj) * 100 : 0;
+                const maxPossiblePts = pj * ptsWin;
+                const effPct = maxPossiblePts > 0 ? (totalPoints / maxPossiblePts) * 100 : 0;
+
+                const orderTieBreaker = (state.players.length - initialIdx) * 0.00001;
+                const tieBreakerIndex = totalPoints + (totalWins * 0.001) + orderTieBreaker;
+
+                return {
+                    ...player,
+                    initialIdx,
+                    totalWins,
+                    totalLosses,
+                    pj,
+                    totalPoints,
+                    winPct,
+                    effPct,
+                    tieBreakerIndex
+                };
+            });
+
+            const rankedPlayers = [...playerStats].sort((a, b) => b.tieBreakerIndex - a.tieBreakerIndex);
+
+            const globalWins = playerStats.reduce((acc, p) => acc + p.totalWins, 0);
+            const globalLosses = playerStats.reduce((acc, p) => acc + p.totalLosses, 0);
+            const globalDiff = globalWins - globalLosses;
+
+            return {
+                playerStats,
+                rankedPlayers,
+                globalWins,
+                globalLosses,
+                globalDiff
+            };
+        }
+
+        // =========================================================================
+        // 3. RENDERIZADO DE TODAS LAS VISTAS
+        // =========================================================================
+        function renderAll() {
+            const stats = computeLeagueStats();
+
+            document.getElementById('pts-win-input').value = state.ptsWin;
+            document.getElementById('pts-loss-input').value = state.ptsLoss;
+
+            renderRankingTable(stats);
+            renderChart(stats);
+            renderQuickMatchForm();
+            renderRoundsView();
+        }
+
+        function setChartMetric(metric) {
+            chartMetric = metric;
+            const winsBtn = document.getElementById('chart-mode-wins');
+            const pointsBtn = document.getElementById('chart-mode-points');
+            const subtitle = document.getElementById('chart-subtitle');
+
+            if (metric === 'wins') {
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
+                subtitle.textContent = 'Evolución de victorias obtenidas por cada jugador a lo largo de las fechas';
+            } else {
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
+                subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
+            }
+
+            renderChart(computeLeagueStats());
+        }
+
+        function renderChart(stats) {
+            const ctx = document.getElementById('rankingChart');
+            if (!ctx) return;
+
+            const labels = state.dates;
+            const ptsWin = Number(state.ptsWin) || 0;
+            const ptsLoss = Number(state.ptsLoss) || 0;
+
+            const playerColors = [
+                { stroke: '#15803d', fill: 'rgba(21, 128, 61, 0.12)' },
+                { stroke: '#2563eb', fill: 'rgba(37, 99, 235, 0.12)' },
+                { stroke: '#d97706', fill: 'rgba(217, 119, 6, 0.12)' },
+                { stroke: '#7c3aed', fill: 'rgba(124, 58, 237, 0.12)' },
+                { stroke: '#db2777', fill: 'rgba(219, 39, 119, 0.12)' }
+            ];
+
+            const datasets = state.players.map((p, idx) => {
+                const color = playerColors[idx % playerColors.length];
+                const seriesData = state.dates.map((_, dIdx) => {
+                    const w = Number(p.wins[dIdx]) || 0;
+                    const l = Number(p.losses[dIdx]) || 0;
+                    return chartMetric === 'wins' ? w : (w * ptsWin) + (l * ptsLoss);
+                });
+
+                return {
+                    label: p.name,
+                    data: seriesData,
+                    borderColor: color.stroke,
+                    backgroundColor: color.fill,
+                    borderWidth: 3,
+                    pointBackgroundColor: color.stroke,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 1.5,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0.25
+                };
+            });
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'Inter', weight: '600', size: 12 },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, font: { family: 'Inter' } },
+                            grid: { color: '#f1f5f9' },
+                            title: {
+                                display: true,
+                                text: chartMetric === 'wins' ? 'Victorias en la Jornada' : 'Puntos en la Jornada',
+                                font: { family: 'Inter', size: 11, weight: '600' }
+                            }
+                        },
+                        x: {
+                            ticks: { font: { family: 'Inter', weight: '600', size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRoundsView() {
+            const filterSelect = document.getElementById('round-filter');
+            const grid = document.getElementById('rounds-grid');
+            if (!filterSelect || !grid) return;
+
+            const currentFilter = filterSelect.value || 'all';
+            filterSelect.innerHTML = `<option value="all">Todas las jornadas (${state.dates.length})</option>` +
+                state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
+            filterSelect.value = currentFilter;
+
+            const ptsWin = Number(state.ptsWin) || 0;
+            const ptsLoss = Number(state.ptsLoss) || 0;
+
+            const indicesToRender = currentFilter === 'all'
+                ? state.dates.map((_, idx) => idx)
+                : [parseInt(currentFilter, 10)];
+
+            grid.innerHTML = indicesToRender.map(dIdx => {
+                const dateLabel = state.dates[dIdx];
+                const totalWins = state.players.reduce((sum, p) => sum + (Number(p.wins[dIdx]) || 0), 0);
+                const totalLosses = state.players.reduce((sum, p) => sum + (Number(p.losses[dIdx]) || 0), 0);
+                const diff = totalWins - totalLosses;
+                const hasActivity = totalWins > 0 || totalLosses > 0;
+
+                let statusBadge = '';
+                if (!hasActivity) {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-600">Sin partidos</span>`;
+                } else if (diff === 0) {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-200 border border-emerald-400/40"><i class="fa-solid fa-circle-check mr-1"></i>OK (Cuadra)</span>`;
+                } else {
+                    const sign = diff > 0 ? `+${diff}` : `${diff}`;
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/25 text-amber-200 border border-amber-400/50"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Dif: ${sign}</span>`;
+                }
+
+                const rowsHtml = state.players.map((p, pIdx) => {
+                    const w = Number(p.wins[dIdx]) || 0;
+                    const l = Number(p.losses[dIdx]) || 0;
+                    const roundPts = (w * ptsWin) + (l * ptsLoss);
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-2.5 px-3 font-bold text-navy-900 text-xs">${escapeHtml(p.name)}</td>
+                            <td class="py-2 px-2 text-center">
+                                <input type="number" min="0" value="${w}" onchange="updateRoundStat('wins', ${pIdx}, ${dIdx}, this.value)" aria-label="Victorias de ${escapeHtml(p.name)} en ${escapeHtml(dateLabel)}" class="w-14 text-center font-extrabold text-emerald-800 bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 rounded-lg py-1 text-xs focus:ring-2 focus:ring-court-500 focus:outline-none">
+                            </td>
+                            <td class="py-2 px-2 text-center">
+                                <input type="number" min="0" value="${l}" onchange="updateRoundStat('losses', ${pIdx}, ${dIdx}, this.value)" aria-label="Derrotas de ${escapeHtml(p.name)} en ${escapeHtml(dateLabel)}" class="w-14 text-center font-extrabold text-rose-800 bg-rose-50/70 hover:bg-rose-50 border border-rose-200 rounded-lg py-1 text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                            </td>
+                            <td class="py-2.5 px-3 text-right">
+                                <span class="inline-block px-2 py-0.5 rounded-md bg-court-100 text-court-900 font-black text-xs">${roundPts} pts</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="bg-white rounded-2xl shadow-sm border ${diff !== 0 && hasActivity ? 'border-amber-300' : 'border-slate-200'} overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="px-4 py-3 bg-navy-900 text-white flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-tennis-neon text-navy-900 font-black text-xs flex items-center justify-center">${dIdx + 1}</span>
+                                    <h3 class="font-bold text-sm">${escapeHtml(dateLabel)}</h3>
+                                </div>
+                                ${statusBadge}
+                            </div>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                        <th class="py-2 px-3">Jugador</th>
+                                        <th class="py-2 px-2 text-center text-emerald-700">Victorias</th>
+                                        <th class="py-2 px-2 text-center text-rose-700">Derrotas</th>
+                                        <th class="py-2 px-3 text-right text-court-900">Pts Jorn.</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] font-bold text-slate-600">
+                            <span>Totales Jornada:</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-emerald-700">${totalWins} Vic</span>
+                                <span class="text-rose-700">${totalLosses} Der</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateRoundStat(type, playerIdx, dateIdx, rawVal) {
+            const val = Math.max(0, parseInt(rawVal, 10) || 0);
+            state.players[playerIdx][type][dateIdx] = val;
+            saveState();
+            renderAll();
+            const label = type === 'wins' ? 'Victorias' : 'Derrotas';
+            showToast(`${state.players[playerIdx].name} (${state.dates[dateIdx]}): ${label} = ${val}`);
+        }
+
+        function renderRankingTable(stats) {
+            const tbody = document.getElementById('ranking-tbody');
+            tbody.innerHTML = stats.rankedPlayers.map((p, index) => {
+                const pos = index + 1;
+                let medalHtml = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-xs">${pos}°</span>`;
+                if (pos === 1) {
+                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 font-black text-sm shadow-sm border border-amber-300" title="1er Lugar"><i class="fa-solid fa-medal"></i></span>`;
+                } else if (pos === 2) {
+                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-black text-sm border border-slate-300" title="2do Lugar"><i class="fa-solid fa-medal"></i></span>`;
+                } else if (pos === 3) {
+                    medalHtml = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-black text-sm border border-orange-300" title="3er Lugar"><i class="fa-solid fa-medal"></i></span>`;
+                }
+
+                return `
+                    <tr class="hover:bg-slate-50/90 transition ${pos === 1 ? 'bg-amber-50/20' : ''}">
+                        <td class="py-3.5 px-4 text-center">${medalHtml}</td>
+                        <td class="py-3.5 px-4 font-bold text-navy-900 text-base">${escapeHtml(p.name)}</td>
+                        <td class="py-3.5 px-4 text-center bg-court-50/60">
+                            <span class="inline-block px-3 py-1 rounded-lg bg-court-700 text-white font-black text-sm shadow-sm">${p.totalPoints}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.pj}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-emerald-700">${p.totalWins}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-rose-600">${p.totalLosses}</td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.winPct.toFixed(1)}%</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <div class="w-16 bg-slate-200 rounded-full h-2 overflow-hidden hidden sm:block">
+                                    <div class="bg-court-600 h-2 rounded-full" style="width: ${Math.min(100, Math.max(0, p.effPct))}%"></div>
+                                </div>
+                                <span class="font-bold text-navy-900 text-xs">${p.effPct.toFixed(1)}%</span>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-500">${p.tieBreakerIndex.toFixed(3)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderQuickMatchForm() {
+            const dateSelect = document.getElementById('quick-date');
+            const winnerSelect = document.getElementById('quick-winner');
+            const loserSelect = document.getElementById('quick-loser');
+
+            const prevDate = dateSelect.value;
+            const prevWinner = winnerSelect.value;
+            const prevLoser = loserSelect.value;
+
+            dateSelect.innerHTML = state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
+            if (prevDate && Number(prevDate) < state.dates.length) dateSelect.value = prevDate;
+
+            const playerOptions = state.players.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)}</option>`).join('');
+            winnerSelect.innerHTML = playerOptions;
+            loserSelect.innerHTML = playerOptions;
+
+            if (prevWinner && Number(prevWinner) < state.players.length) {
+                winnerSelect.value = prevWinner;
+            }
+            if (prevLoser && Number(prevLoser) < state.players.length && prevLoser !== winnerSelect.value) {
+                loserSelect.value = prevLoser;
+            } else if (state.players.length > 1) {
+                loserSelect.value = '1';
+            }
+
+            const logList = document.getElementById('quick-log-list');
+            const logCount = document.getElementById('quick-log-count');
+            logCount.textContent = `${state.quickLogs.length} registro${state.quickLogs.length === 1 ? '' : 's'}`;
+
+            if (state.quickLogs.length === 0) {
+                logList.innerHTML = `<p class="text-slate-400 italic py-2">Aún no has registrado partidos individuales en esta sesión.</p>`;
+            } else {
+                logList.innerHTML = state.quickLogs.slice(0, 8).map(item => `
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-navy-800 text-white font-bold text-[11px]">${escapeHtml(item.date)}</span>
+                            <span><strong class="text-emerald-700">${escapeHtml(item.winner)}</strong> venció a <strong class="text-rose-700">${escapeHtml(item.loser)}</strong></span>
+                        </div>
+                        <span class="text-[11px] text-slate-400">${escapeHtml(item.time)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // =========================================================================
+        // 4. ACCIONES INTERACTIVAS DEL USUARIO
+        // =========================================================================
+        function switchTab(tabName) {
+            ['ranking', 'quick', 'rounds'].forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    view.classList.remove('hidden');
+                    btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-tennis-neon text-navy-900 shadow-sm';
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20';
+                }
+            });
+            if (tabName === 'ranking') {
+                renderChart(computeLeagueStats());
+            }
+        }
+
+        function updateScoringRules() {
+            const w = parseInt(document.getElementById('pts-win-input').value, 10);
+            const l = parseInt(document.getElementById('pts-loss-input').value, 10);
+            state.ptsWin = isNaN(w) || w < 0 ? 0 : w;
+            state.ptsLoss = isNaN(l) || l < 0 ? 0 : l;
+            saveState();
+            renderAll();
+            showToast(`Puntuación actualizada: Victoria = ${state.ptsWin} pts, Derrota = ${state.ptsLoss} pt`);
+        }
+
+        function handleQuickMatchSubmit(e) {
+            e.preventDefault();
+            const dateIdx = parseInt(document.getElementById('quick-date').value, 10);
+            const winnerIdx = parseInt(document.getElementById('quick-winner').value, 10);
+            const loserIdx = parseInt(document.getElementById('quick-loser').value, 10);
+
+            if (winnerIdx === loserIdx) {
+                showToast('El ganador y el perdedor deben ser jugadores distintos.', 'warning');
+                return;
+            }
+
+            state.players[winnerIdx].wins[dateIdx] = (Number(state.players[winnerIdx].wins[dateIdx]) || 0) + 1;
+            state.players[loserIdx].losses[dateIdx] = (Number(state.players[loserIdx].losses[dateIdx]) || 0) + 1;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            state.quickLogs.unshift({
+                date: state.dates[dateIdx],
+                winner: state.players[winnerIdx].name,
+                loser: state.players[loserIdx].name,
+                time: timeStr
+            });
+
+            saveState();
+            renderAll();
+            showToast(`Partido registrado: ${state.players[winnerIdx].name} (+1V) vs ${state.players[loserIdx].name} (+1D)`);
+        }
+
+        // =========================================================================
+        // 5. UTILIDADES UI (TOASTS Y SEGURIDAD XSS)
+        // =========================================================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const isWarn = type === 'warning';
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white transform transition-all duration-300 ${isWarn ? 'bg-amber-600' : 'bg-navy-900 border border-court-600'}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${isWarn ? 'fa-circle-exclamation text-amber-200' : 'fa-circle-check text-tennis-neon'} text-sm"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Exponer funciones al ámbito global window para los atributos onclick/onchange del HTML
+        window.switchTab = switchTab;
+        window.setChartMetric = setChartMetric;
+        window.updateScoringRules = updateScoringRules;
+        window.handleQuickMatchSubmit = handleQuickMatchSubmit;
+        window.renderRoundsView = renderRoundsView;
+        window.updateRoundStat = updateRoundStat;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+            initFirebaseSync();
+        });
+    </script>
+</body>
+</html>
