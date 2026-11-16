@@ -75,6 +75,18 @@
 
     <!-- Notificación Toast Flotante -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <dialog id="login-dialog" class="rounded-2xl p-0 shadow-2xl backdrop:bg-black/50 w-[90vw] max-w-sm">
+    <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
+        <h3 class="text-base font-bold text-navy-900">Iniciar sesión para editar</h3>
+        <input id="login-email" type="email" required autocomplete="username" placeholder="Correo" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
+        <input id="login-pass" type="password" required autocomplete="current-password" placeholder="Contraseña" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
+        <p id="login-error" class="hidden text-xs text-rose-600 font-semibold"></p>
+        <div class="flex justify-end gap-2">
+            <button type="button" onclick="document.getElementById('login-dialog').close()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100">Cancelar</button>
+            <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-court-700">Entrar</button>
+        </div>
+    </form>
+</dialog>
 
     <!-- Encabezado Deportivo -->
     <header class="bg-gradient-to-r from-navy-900 via-navy-800 to-court-900 text-white shadow-lg border-b-4 border-tennis-neon">
