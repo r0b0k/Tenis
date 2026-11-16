@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -105,6 +104,10 @@
                     <i class="fa-solid fa-bolt"></i>
                     <span>2. Registro Rápido (1 vs 1)</span>
                 </button>
+                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition whitespace-nowrap bg-white/10 text-slate-200 hover:bg-white/20">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>3. Resultados por Jornada</span>
+                </button>
             </nav>
         </div>
     </header>
@@ -116,7 +119,7 @@
         <!-- PESTAÑA 1: RANKING GENERAL (TIEMPO REAL)                  -->
         <!-- ========================================================= -->
         <section id="view-ranking" class="space-y-6">
-
+            
             <!-- Tabla Principal de Ranking -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="px-6 py-4 bg-navy-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -160,12 +163,19 @@
                 
                 <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div>
                             <h3 class="text-base font-bold text-navy-900">Rendimiento por Jornada</h3>
-                            <p class="text-xs text-slate-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <p id="chart-subtitle" class="text-xs text-slate-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
                         </div>
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">Temporada 2026</span>
+                        <div class="inline-flex rounded-xl bg-slate-100 p-1 self-start sm:self-auto">
+                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition">
+                                Victorias
+                            </button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition">
+                                Puntos
+                            </button>
+                        </div>
                     </div>
                     <div class="relative h-64 w-full">
                         <canvas id="rankingChart"></canvas>
@@ -284,6 +294,32 @@
             </div>
         </section>
 
+        <!-- ========================================================= -->
+        <!-- PESTAÑA 3: RESULTADOS POR JORNADA (EDITABLE)              -->
+        <!-- ========================================================= -->
+        <section id="view-rounds" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-navy-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-court-600"></i>
+                        Resultados Editables por Jornada
+                    </h2>
+                    <p class="text-xs text-slate-500">Edita directamente las victorias y derrotas de cada jugador por fecha. Los puntos, el cuadre y el ranking se actualizan al instante.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="round-filter" class="text-xs font-bold text-slate-600 whitespace-nowrap">Filtrar fecha:</label>
+                    <select id="round-filter" onchange="renderRoundsView()" class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
+                        <option value="all">Todas las jornadas (13)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grilla de Tarjetas por Jornada -->
+            <div id="rounds-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Renderizado dinámico por JS -->
+            </div>
+        </section>
+
     </main>
 
     <!-- Pie de página -->
@@ -298,6 +334,9 @@
 
     <!-- Lógica Completa de la Aplicación -->
     <script>
+        // =========================================================================
+        // 1. ESTADO INICIAL EXACTAMENTE IGUAL AL ARCHIVO EXCEL (2026)
+        // =========================================================================
         const STORAGE_KEY = 'liga_tenis_rotativa_2026_v3';
 
         const DEFAULT_DATES = [
@@ -340,6 +379,7 @@
 
         let state = loadState();
         let chartInstance = null;
+        let chartMetric = 'wins';
 
         function loadState() {
             try {
@@ -364,6 +404,9 @@
             }
         }
 
+        // =========================================================================
+        // 2. MOTOR DE CÁLCULO (FÓRMULAS EXACTAS DEL EXCEL)
+        // =========================================================================
         function computeLeagueStats() {
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
@@ -409,6 +452,9 @@
             };
         }
 
+        // =========================================================================
+        // 3. RENDERIZADO DE TODAS LAS VISTAS
+        // =========================================================================
         function renderAll() {
             const stats = computeLeagueStats();
 
@@ -418,6 +464,213 @@
             renderRankingTable(stats);
             renderChart(stats);
             renderQuickMatchForm();
+            renderRoundsView();
+        }
+
+        function setChartMetric(metric) {
+            chartMetric = metric;
+            const winsBtn = document.getElementById('chart-mode-wins');
+            const pointsBtn = document.getElementById('chart-mode-points');
+            const subtitle = document.getElementById('chart-subtitle');
+
+            if (metric === 'wins') {
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
+                subtitle.textContent = 'Evolución de victorias obtenidas por cada jugador a lo largo de las fechas';
+            } else {
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-navy-900 transition';
+                subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
+            }
+
+            renderChart(computeLeagueStats());
+        }
+
+        function renderChart(stats) {
+            const ctx = document.getElementById('rankingChart');
+            if (!ctx) return;
+
+            const labels = state.dates;
+            const ptsWin = Number(state.ptsWin) || 0;
+            const ptsLoss = Number(state.ptsLoss) || 0;
+
+            const playerColors = [
+                { stroke: '#15803d', fill: 'rgba(21, 128, 61, 0.12)' },
+                { stroke: '#2563eb', fill: 'rgba(37, 99, 235, 0.12)' },
+                { stroke: '#d97706', fill: 'rgba(217, 119, 6, 0.12)' },
+                { stroke: '#7c3aed', fill: 'rgba(124, 58, 237, 0.12)' },
+                { stroke: '#db2777', fill: 'rgba(219, 39, 119, 0.12)' }
+            ];
+
+            const datasets = state.players.map((p, idx) => {
+                const color = playerColors[idx % playerColors.length];
+                const seriesData = state.dates.map((_, dIdx) => {
+                    const w = Number(p.wins[dIdx]) || 0;
+                    const l = Number(p.losses[dIdx]) || 0;
+                    return chartMetric === 'wins' ? w : (w * ptsWin) + (l * ptsLoss);
+                });
+
+                return {
+                    label: p.name,
+                    data: seriesData,
+                    borderColor: color.stroke,
+                    backgroundColor: color.fill,
+                    borderWidth: 3,
+                    pointBackgroundColor: color.stroke,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 1.5,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    tension: 0.25
+                };
+            });
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'Inter', weight: '600', size: 12 },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, font: { family: 'Inter' } },
+                            grid: { color: '#f1f5f9' },
+                            title: {
+                                display: true,
+                                text: chartMetric === 'wins' ? 'Victorias en la Jornada' : 'Puntos en la Jornada',
+                                font: { family: 'Inter', size: 11, weight: '600' }
+                            }
+                        },
+                        x: {
+                            ticks: { font: { family: 'Inter', weight: '600', size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRoundsView() {
+            const filterSelect = document.getElementById('round-filter');
+            const grid = document.getElementById('rounds-grid');
+            if (!filterSelect || !grid) return;
+
+            const currentFilter = filterSelect.value || 'all';
+            filterSelect.innerHTML = `<option value="all">Todas las jornadas (${state.dates.length})</option>` +
+                state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
+            filterSelect.value = currentFilter;
+
+            const ptsWin = Number(state.ptsWin) || 0;
+            const ptsLoss = Number(state.ptsLoss) || 0;
+
+            const indicesToRender = currentFilter === 'all'
+                ? state.dates.map((_, idx) => idx)
+                : [parseInt(currentFilter, 10)];
+
+            grid.innerHTML = indicesToRender.map(dIdx => {
+                const dateLabel = state.dates[dIdx];
+                const totalWins = state.players.reduce((sum, p) => sum + (Number(p.wins[dIdx]) || 0), 0);
+                const totalLosses = state.players.reduce((sum, p) => sum + (Number(p.losses[dIdx]) || 0), 0);
+                const diff = totalWins - totalLosses;
+                const hasActivity = totalWins > 0 || totalLosses > 0;
+
+                let statusBadge = '';
+                if (!hasActivity) {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-600">Sin partidos</span>`;
+                } else if (diff === 0) {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-200 border border-emerald-400/40"><i class="fa-solid fa-circle-check mr-1"></i>OK (Cuadra)</span>`;
+                } else {
+                    const sign = diff > 0 ? `+${diff}` : `${diff}`;
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/25 text-amber-200 border border-amber-400/50"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Dif: ${sign}</span>`;
+                }
+
+                const rowsHtml = state.players.map((p, pIdx) => {
+                    const w = Number(p.wins[dIdx]) || 0;
+                    const l = Number(p.losses[dIdx]) || 0;
+                    const roundPts = (w * ptsWin) + (l * ptsLoss);
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-2.5 px-3 font-bold text-navy-900 text-xs">${escapeHtml(p.name)}</td>
+                            <td class="py-2 px-2 text-center">
+                                <input type="number" min="0" value="${w}" onchange="updateRoundStat('wins', ${pIdx}, ${dIdx}, this.value)" aria-label="Victorias de ${escapeHtml(p.name)} en ${escapeHtml(dateLabel)}" class="w-14 text-center font-extrabold text-emerald-800 bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 rounded-lg py-1 text-xs focus:ring-2 focus:ring-court-500 focus:outline-none">
+                            </td>
+                            <td class="py-2 px-2 text-center">
+                                <input type="number" min="0" value="${l}" onchange="updateRoundStat('losses', ${pIdx}, ${dIdx}, this.value)" aria-label="Derrotas de ${escapeHtml(p.name)} en ${escapeHtml(dateLabel)}" class="w-14 text-center font-extrabold text-rose-800 bg-rose-50/70 hover:bg-rose-50 border border-rose-200 rounded-lg py-1 text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                            </td>
+                            <td class="py-2.5 px-3 text-right">
+                                <span class="inline-block px-2 py-0.5 rounded-md bg-court-100 text-court-900 font-black text-xs">${roundPts} pts</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="bg-white rounded-2xl shadow-sm border ${diff !== 0 && hasActivity ? 'border-amber-300' : 'border-slate-200'} overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="px-4 py-3 bg-navy-900 text-white flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-tennis-neon text-navy-900 font-black text-xs flex items-center justify-center">${dIdx + 1}</span>
+                                    <h3 class="font-bold text-sm">${escapeHtml(dateLabel)}</h3>
+                                </div>
+                                ${statusBadge}
+                            </div>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                        <th class="py-2 px-3">Jugador</th>
+                                        <th class="py-2 px-2 text-center text-emerald-700">Victorias</th>
+                                        <th class="py-2 px-2 text-center text-rose-700">Derrotas</th>
+                                        <th class="py-2 px-3 text-right text-court-900">Pts Jorn.</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] font-bold text-slate-600">
+                            <span>Totales Jornada:</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-emerald-700">${totalWins} Vic</span>
+                                <span class="text-rose-700">${totalLosses} Der</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateRoundStat(type, playerIdx, dateIdx, rawVal) {
+            const val = Math.max(0, parseInt(rawVal, 10) || 0);
+            state.players[playerIdx][type][dateIdx] = val;
+            saveState();
+            renderAll();
+            const label = type === 'wins' ? 'Victorias' : 'Derrotas';
+            showToast(`${state.players[playerIdx].name} (${state.dates[dateIdx]}): ${label} = ${val}`);
         }
 
         function renderRankingTable(stats) {
@@ -456,76 +709,6 @@
                     </tr>
                 `;
             }).join('');
-        }
-
-        // Gráfico cambiado a Rendimiento por Jornada (Líneas / Barras por fecha)
-        function renderChart(stats) {
-            const ctx = document.getElementById('rankingChart');
-            if (!ctx) return;
-
-            const labels = state.dates;
-            
-            // Paleta de colores para los jugadores
-            const playerColors = [
-                { stroke: '#15803d', fill: 'rgba(21, 128, 61, 0.1)' },
-                { stroke: '#2563eb', fill: 'rgba(37, 99, 235, 0.1)' },
-                { stroke: '#d97706', fill: 'rgba(217, 119, 6, 0.1)' },
-                { stroke: '#7c3aed', fill: 'rgba(124, 58, 237, 0.1)' },
-                { stroke: '#db2777', fill: 'rgba(219, 39, 119, 0.1)' }
-            ];
-
-            const datasets = state.players.map((p, idx) => {
-                const color = playerColors[idx % playerColors.length];
-                return {
-                    label: p.name,
-                    data: p.wins,
-                    borderColor: color.stroke,
-                    backgroundColor: color.fill,
-                    borderWidth: 3,
-                    pointBackgroundColor: color.stroke,
-                    pointRadius: 4,
-                    fill: false,
-                    tension: 0.2
-                };
-            });
-
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
-
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: { family: 'Inter', weight: '600', size: 12 },
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { precision: 0, font: { family: 'Inter' } },
-                            grid: { color: '#f1f5f9' },
-                            title: { display: true, text: 'Victorias en la Jornada' }
-                        },
-                        x: {
-                            ticks: { font: { family: 'Inter', weight: '600' } },
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
         }
 
         function renderQuickMatchForm() {
@@ -572,8 +755,11 @@
             }
         }
 
+        // =========================================================================
+        // 4. ACCIONES INTERACTIVAS DEL USUARIO
+        // =========================================================================
         function switchTab(tabName) {
-            ['ranking', 'quick'].forEach(t => {
+            ['ranking', 'quick', 'rounds'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 const btn = document.getElementById(`tab-btn-${t}`);
                 if (t === tabName) {
@@ -627,6 +813,9 @@
             showToast(`Partido registrado: ${state.players[winnerIdx].name} (+1V) vs ${state.players[loserIdx].name} (+1D)`);
         }
 
+        // =========================================================================
+        // 5. UTILIDADES UI (TOASTS Y SEGURIDAD XSS)
+        // =========================================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -658,4 +847,3 @@
     </script>
 </body>
 </html>
-
