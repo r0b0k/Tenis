@@ -327,23 +327,24 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <p><strong>Liga de Tenis Rotativa (2026)</strong> • Basado exactamente en la lógica de <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">Registro_Tenis_Fines_de_Semana_2026-v3.xlsx</code></p>
             <p id="footer-sync-status" class="flex items-center gap-1.5 text-court-700 font-medium">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Sincronización en la nube activa (Firebase)
+                <i class="fa-solid fa-cloud-arrow-up"></i> Sincronización en la nube activa (Firebase Realtime DB)
             </p>
         </div>
     </footer>
 
-    <!-- Lógica Completa de la Aplicación con Firebase Firestore -->
+    <!-- Lógica Completa de la Aplicación con Firebase Realtime Database -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         // =========================================================================
-        // 1. CONFIGURACIÓN DE FIREBASE Y ESTADO INICIAL (2026)
+        // 1. CONFIGURACIÓN DE FIREBASE REALTIME DATABASE Y ESTADO INICIAL (2026)
         // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC_vZXquA24kJ410JMBCmp5jPKkE4heM5I",
             authDomain: "tenis-rotativo.firebaseapp.com",
+            databaseURL: "https://tenis-rotativo-default-rtdb.firebaseio.com",
             projectId: "tenis-rotativo",
             storageBucket: "tenis-rotativo.firebasestorage.app",
             messagingSenderId: "1029197173515",
@@ -352,10 +353,10 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tenis-rotativo-2026';
+        const db = getDatabase(app);
 
-        const leagueDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'liga_tenis', 'temporada_2026');
+        // Referencia al nodo principal en Realtime Database
+        const leagueRef = ref(db, 'liga_tenis/temporada_2026');
 
         const DEFAULT_DATES = [
             'Dom 15-Nov', 'Sáb 21-Nov', 'Dom 22-Nov', 'Sáb 28-Nov', 'Dom 29-Nov',
@@ -382,7 +383,7 @@
 
         let state = getInitialState();
         let currentUser = null;
-        let unsubscribeSnapshot = null;
+        let unsubscribeDb = null;
         let chartInstance = null;
         let chartMetric = 'wins';
 
@@ -405,30 +406,36 @@
         }
 
         function subscribeToLeagueData() {
-            if (unsubscribeSnapshot) unsubscribeSnapshot();
+            if (unsubscribeDb) unsubscribeDb();
 
-            unsubscribeSnapshot = onSnapshot(leagueDocRef, async (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+            unsubscribeDb = onValue(leagueRef, async (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
                     if (data && Array.isArray(data.players) && Array.isArray(data.dates)) {
+                        // Realtime DB omite arrays vacíos, por lo que aseguramos quickLogs como arreglo
                         state = {
                             ptsWin: Number(data.ptsWin ?? 2),
                             ptsLoss: Number(data.ptsLoss ?? 1),
                             dates: data.dates,
-                            players: data.players,
+                            players: data.players.map(p => ({
+                                ...p,
+                                wins: Array.isArray(p.wins) ? p.wins : Array(data.dates.length).fill(0),
+                                losses: Array.isArray(p.losses) ? p.losses : Array(data.dates.length).fill(0)
+                            })),
                             quickLogs: Array.isArray(data.quickLogs) ? data.quickLogs : []
                         };
                         renderAll();
                         updateSyncBadge('online', 'Sincronizado en tiempo real');
                     }
                 } else {
+                    // Primera vez: poblar la base de datos con el estado inicial
                     await saveState();
                     renderAll();
                 }
             }, (error) => {
-                console.error('Error en suscripción Firestore:', error);
-                updateSyncBadge('error', `Error Firestore: ${error.code}`);
-                showToast(`Error de lectura (${error.code}): Revisa reglas o dominio.`, 'warning');
+                console.error('Error en suscripción Realtime DB:', error);
+                updateSyncBadge('error', `Error DB: ${error.code || 'Permiso denegado'}`);
+                showToast(`Error de lectura: Revisa las reglas de Realtime Database.`, 'warning');
             });
         }
 
@@ -438,11 +445,10 @@
                 return;
             }
 
-            // Timeout de seguridad por si Firebase tarda más de 8 segundos en conectar
             const connectionTimeout = setTimeout(() => {
                 if (!currentUser) {
                     updateSyncBadge('error', 'Timeout: Bloqueado por AdBlock/Red');
-                    showToast('La conexión a Firebase tardó demasiado. Desactiva bloqueadores de publicidad (uBlock/Brave Shields).', 'warning');
+                    showToast('La conexión a Firebase tardó demasiado. Desactiva bloqueadores de anuncios.', 'warning');
                 }
             }, 8000);
 
@@ -455,11 +461,7 @@
             });
 
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                await signInAnonymously(auth);
             } catch (err) {
                 clearTimeout(connectionTimeout);
                 console.error('Error inicializando autenticación:', err);
@@ -478,7 +480,7 @@
             }
             try {
                 updateSyncBadge('saving', 'Guardando...');
-                await setDoc(leagueDocRef, {
+                await set(leagueRef, {
                     ptsWin: state.ptsWin,
                     ptsLoss: state.ptsLoss,
                     dates: state.dates,
@@ -488,9 +490,9 @@
                 });
                 updateSyncBadge('online', 'Sincronizado en tiempo real');
             } catch (e) {
-                console.error('Error guardando en Firestore:', e);
-                updateSyncBadge('error', `Error al guardar: ${e.code}`);
-                showToast(`Error al guardar (${e.code}): Revisa las reglas de Firestore.`, 'warning');
+                console.error('Error guardando en Realtime DB:', e);
+                updateSyncBadge('error', `Error al guardar: ${e.code || 'Permiso denegado'}`);
+                showToast(`Error al guardar: Revisa las reglas de Realtime Database.`, 'warning');
             }
         }
 
