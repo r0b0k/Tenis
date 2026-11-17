@@ -1,26 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KLCTHV9N"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0b0f14">
     <meta name="color-scheme" content="dark">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎾%3C/text%3E%3C/svg%3E">
-    <title>Liga de Tenis Rotativa (2026) - Ranking y Registro</title>
+    <title>Liga de Tenis Rotativa 2026 · Ranking, resultados y registro de partidos</title>
+    <meta name="description" content="Ranking en vivo de la Liga de Tenis Rotativa 2026: tabla de posiciones, resultados por jornada y registro de partidos. Instálala como app en tu celular.">
+    <meta name="keywords" content="liga de tenis, ranking de tenis, tabla de posiciones, resultados por jornada, registro de partidos, torneo de tenis, liga rotativa, tenis fines de semana, 2026">
+    <meta name="author" content="r0b0k">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://r0b0k.github.io/Tenis/">
+
+    <!-- Compartir: Open Graph (WhatsApp, Facebook, LinkedIn, Telegram) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Liga de Tenis Rotativa">
+    <meta property="og:locale" content="es_CL">
+    <meta property="og:title" content="🎾 Liga de Tenis Rotativa 2026">
+    <meta property="og:description" content="Mira el ranking en vivo, los resultados por jornada y la gráfica de rendimiento de la liga.">
+    <meta property="og:url" content="https://r0b0k.github.io/Tenis/">
+    <meta property="og:image" content="https://r0b0k.github.io/Tenis/og-image.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Liga de Tenis Rotativa 2026: pelota de tenis sobre fondo oscuro">
+
+    <!-- Compartir: Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🎾 Liga de Tenis Rotativa 2026">
+    <meta name="twitter:description" content="Mira el ranking en vivo, los resultados por jornada y la gráfica de rendimiento de la liga.">
+    <meta name="twitter:image" content="https://r0b0k.github.io/Tenis/og-image.png">
+    <meta name="twitter:image:alt" content="Liga de Tenis Rotativa 2026">
+
+    <!-- App instalable (PWA) -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="application-name" content="Liga Tenis">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Liga Tenis">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎾%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <!-- Datos estructurados (SEO) -->
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Liga de Tenis Rotativa 2026", "alternateName": "Liga Tenis", "url": "https://r0b0k.github.io/Tenis/", "description": "Ranking en vivo de la Liga de Tenis Rotativa 2026: tabla de posiciones, resultados por jornada y registro de partidos. Instálala como app en tu celular.", "applicationCategory": "SportsApplication", "operatingSystem": "Any", "browserRequirements": "Requires JavaScript", "inLanguage": "es", "image": "https://r0b0k.github.io/Tenis/og-image.png", "author": {"@type": "Person", "name": "r0b0k"}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome para iconografía deportiva -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js para gráficos de rendimiento -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.js"></script>
 
@@ -125,6 +156,12 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
+    <noscript>
+        <div style="padding:24px;font-family:sans-serif;background:#131a22;color:#e8edf2;text-align:center">
+            <h1>🎾 Liga de Tenis Rotativa 2026</h1>
+            <p>Ranking en vivo, resultados por jornada y registro de partidos. Activa JavaScript para ver los datos de la liga.</p>
+        </div>
+    </noscript>
 
     <!-- Notificación Toast Flotante -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
@@ -153,18 +190,20 @@
                 </div>
             </div>
             <nav class="order-last w-full md:order-none md:w-auto flex gap-1 bg-white border border-zinc-200 rounded-full p-1 overflow-x-auto">
-                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-court-600"><i class="fa-solid fa-ranking-star text-xs"></i><span>Ranking</span></button>
-                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900"><i class="fa-solid fa-bolt text-xs"></i><span>Registro</span></button>
-                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900"><i class="fa-solid fa-calendar-days text-xs"></i><span>Jornadas</span></button>
+                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-court-600"><span class="text-xs" aria-hidden="true">🏆</span><span>Ranking</span></button>
+                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900"><span class="text-xs" aria-hidden="true">⚡</span><span>Registro</span></button>
+                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900"><span class="text-xs" aria-hidden="true">📅</span><span>Jornadas</span></button>
             </nav>
             <div class="flex items-center gap-2 shrink-0">
                 <span id="auth-user" class="hidden text-xs text-slate-500 truncate max-w-[120px] sm:max-w-[200px]"></span>
                 <button id="login-btn" type="button" onclick="openLogin()" class="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-zinc-900 text-xs font-semibold flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-lock"></i> Iniciar sesión
+                    <span aria-hidden="true">🔒</span> Iniciar sesión
                 </button>
                 <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-zinc-900 text-xs font-semibold flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-right-from-bracket"></i> Salir
+                    <span aria-hidden="true">🚪</span> Salir
                 </button>
+                <button id="share-btn" type="button" onclick="shareApp()" aria-label="Compartir" title="Compartir" class="px-3 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-sm transition">📤</button>
+                <button id="install-btn" type="button" onclick="installApp()" class="hidden px-3 py-2.5 rounded-xl bg-court-600 text-xs font-bold transition">📲 Instalar</button>
             </div>
         </div>
     </header>
@@ -184,13 +223,13 @@
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div>
-                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><i class="fa-solid fa-chart-line text-court-600"></i> Rendimiento por Jornada</h3>
+                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">📈</span> Rendimiento por Jornada</h3>
                             <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
                             <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
                         </div>
                         <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
-                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition"><i class="fa-solid fa-trophy mr-1"></i>Victorias</button>
-                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><i class="fa-solid fa-star mr-1"></i>Puntos</button>
+                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition"><span class="mr-1" aria-hidden="true">🏆</span>Victorias</button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><span class="mr-1" aria-hidden="true">⭐</span>Puntos</button>
                         </div>
                     </div>
                     <div class="relative h-72 w-full">
@@ -199,7 +238,7 @@
                 </div>
                 <!-- Últimos partidos -->
                 <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
-                    <h3 class="text-base font-bold text-navy-900 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-court-600"></i> Últimos partidos</h3>
+                    <h3 class="text-base font-bold text-navy-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">🕘</span> Últimos partidos</h3>
                     <div id="recent-matches" class="flex flex-col gap-3 text-sm"></div>
                 </div>
             </div>
@@ -209,7 +248,7 @@
                 <div class="px-6 py-4 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
-                            <i class="fa-solid fa-medal text-court-600"></i>
+                            <span class="text-court-600" aria-hidden="true">🏅</span>
                             Tabla General de Posiciones
                         </h2>
                         <p class="text-xs text-zinc-500">Ordenada automáticamente por Índice de Desempate en tiempo real</p>
@@ -246,7 +285,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <div class="flex items-center gap-2 text-navy-900 mb-1">
-                            <i class="fa-solid fa-sliders text-court-600"></i>
+                            <span class="text-court-600" aria-hidden="true">⚙️</span>
                             <h3 class="text-base font-bold">Sistema de Puntuación</h3>
                         </div>
                         <p class="text-xs text-slate-500 mb-4">Valores configurables.</p>
@@ -271,7 +310,7 @@
 
                     <div class="bg-court-50 border border-court-200 rounded-xl p-4 text-xs text-court-900 space-y-2">
                         <div class="font-bold flex items-center gap-1.5">
-                            <i class="fa-solid fa-scale-balanced text-court-700"></i>
+                            <span class="text-court-700" aria-hidden="true">⚖️</span>
                             <span>Criterio de Desempate Oficial</span>
                         </div>
                         <p class="leading-relaxed text-court-800">
@@ -285,7 +324,7 @@
             <!-- Panel de jugadores (solo editores) -->
             <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
                 <div class="flex items-center gap-2 text-navy-900">
-                    <i class="fa-solid fa-users text-court-600"></i>
+                    <span class="text-court-600" aria-hidden="true">👥</span>
                     <h3 class="text-base font-bold">Jugadores</h3>
                 </div>
                 <ul id="players-list" class="divide-y divide-slate-100 text-sm"></ul>
@@ -304,7 +343,7 @@
                 <div class="px-6 py-5 border-b border-zinc-200">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-lime-200 text-lime-800 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-bolt text-lg"></i>
+                            <span class="text-lg" aria-hidden="true">⚡</span>
                         </div>
                         <div>
                             <h2 class="text-lg font-bold text-zinc-900">Asistente Rápido de Partido (1 vs 1)</h2>
@@ -324,7 +363,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
                             <label for="quick-winner" class="block text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">
-                                <i class="fa-solid fa-trophy text-emerald-600 mr-1"></i> Ganador (+1 Victoria)
+                                <span class="text-emerald-600 mr-1" aria-hidden="true">🏆</span> Ganador (+1 Victoria)
                             </label>
                             <select id="quick-winner" class="w-full rounded-xl border border-emerald-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                                 <!-- Opciones dinámicas -->
@@ -333,7 +372,7 @@
 
                         <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200">
                             <label for="quick-loser" class="block text-xs font-bold uppercase tracking-wider text-rose-800 mb-2">
-                                <i class="fa-solid fa-xmark text-rose-600 mr-1"></i> Perdedor (+1 Derrota)
+                                <span class="text-rose-600 mr-1" aria-hidden="true">❌</span> Perdedor (+1 Derrota)
                             </label>
                             <select id="quick-loser" class="w-full rounded-xl border border-rose-300 bg-white px-3.5 py-2.5 text-sm font-bold text-navy-900 focus:ring-2 focus:ring-rose-500 focus:outline-none">
                                 <!-- Opciones dinámicas -->
@@ -343,11 +382,11 @@
 
                     <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
                         <span class="text-xs text-slate-500 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check text-court-600"></i>
+                            <span class="text-court-600" aria-hidden="true">✅</span>
                             <span id="quick-hint">Garantiza cuadre exacto (Dif: 0) en la jornada seleccionada</span>
                         </span>
                         <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-court-700 hover:bg-court-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition disabled:bg-slate-300 disabled:hover:bg-slate-300 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus-circle"></i>
+                            <span aria-hidden="true">➕</span>
                             <span>Registrar Resultado del Partido</span>
                         </button>
                     </div>
@@ -373,7 +412,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-navy-900 flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-check text-court-600"></i>
+                        <span class="text-court-600" aria-hidden="true">✅</span>
                         Resultados Editables por Jornada
                     </h2>
                     <p class="text-xs text-slate-500">Edita directamente las victorias y derrotas de cada jugador por fecha. Los puntos, el cuadre y el ranking se actualizan al instante.</p>
@@ -389,7 +428,7 @@
             <!-- Agregar nueva jornada (solo editores) -->
             <form id="round-add-form" data-admin-only onsubmit="addRound(event)" class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-court-600 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-calendar-plus"></i></div>
+                    <div class="w-10 h-10 rounded-xl bg-court-600 text-white flex items-center justify-center shrink-0"><span aria-hidden="true">🗓️</span></div>
                     <div>
                         <h3 class="text-sm font-bold text-navy-900">Agregar nueva jornada</h3>
                         <p class="text-xs text-slate-500">Se crea para todos los jugadores con 0 victorias y 0 derrotas, y aparece al instante.</p>
@@ -397,7 +436,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <input id="new-round-date" type="date" required class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-plus"></i> Agregar jornada</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">➕</span> Agregar jornada</button>
                 </div>
             </form>
 
@@ -414,7 +453,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <p><strong>Liga de Tenis Rotativa (2026)</strong> • Basado exactamente en la lógica de <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">Registro_Tenis_Fines_de_Semana_2026-v3.xlsx</code></p>
             <p id="footer-sync-status" class="flex items-center gap-1.5 text-court-700 font-medium">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Sincronización en la nube activa (Firebase Realtime DB)
+                <span aria-hidden="true">☁️</span> Sincronización en la nube activa (Firebase Realtime DB)
             </p>
         </div>
     </footer>
@@ -485,13 +524,13 @@
             if (status === 'online') {
                 badge.className = base + 'bg-emerald-50 text-emerald-700 ring-emerald-200';
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ${escapeHtml(text)}`;
-                if (footer) footer.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${escapeHtml(text)}`;
+                if (footer) footer.innerHTML = `<span aria-hidden="true">☁️</span> ${escapeHtml(text)}`;
             } else if (status === 'saving') {
                 badge.className = base + 'bg-sky-50 text-sky-700 ring-sky-200';
-                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Guardando...`;
+                badge.innerHTML = `<span class="text-[10px] inline-block animate-spin" aria-hidden="true">🔄</span> Guardando...`;
             } else {
                 badge.className = base + 'bg-rose-50 text-rose-700 ring-rose-200';
-                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(text)}`;
+                badge.innerHTML = `<span aria-hidden="true">⚠️</span> ${escapeHtml(text)}`;
             }
         }
 
@@ -527,6 +566,7 @@
                         quickLogs: normalizeQuickLogs(data.quickLogs)
                     };
                     renderAll();
+                    saveCache();
                     updateSyncBadge('online', 'Sincronizado en tiempo real');
                 }
             }, (error) => {
@@ -732,7 +772,7 @@
 
             const lead = stats && stats.rankedPlayers && stats.rankedPlayers[0];
             const chip = document.getElementById('chart-leader');
-            if (chip && lead) chip.innerHTML = `<i class="fa-solid fa-crown text-amber-500"></i> Líder: <strong>${escapeHtml(lead.name)}</strong> · ${lead.totalPoints} pts`;
+            if (chip && lead) chip.innerHTML = `<span class="text-amber-500" aria-hidden="true">👑</span> Líder: <strong>${escapeHtml(lead.name)}</strong> · ${lead.totalPoints} pts`;
 
             const datasets = state.players.map((p, idx) => {
                 const color = palette[idx % palette.length];
@@ -852,7 +892,7 @@
                 const lead = i === 0;
                 const pct = p.winPct.toFixed(1).replace('.', ',');
                 return `<div class="bg-white rounded-3xl p-6 sm:p-7 border ${lead ? 'border-court-600' : 'border-zinc-200'}" ${lead ? 'style="box-shadow:0 12px 40px -18px rgba(198,244,50,.45)"' : ''}>
-                    <div class="text-[11px] font-semibold tracking-[.14em] ${lead ? 'text-court-600' : 'text-slate-500'}">${i + 1}°${lead ? ' · LÍDER' : ''}</div>
+                    <div class="text-[11px] font-semibold tracking-[.14em] ${lead ? 'text-court-600' : 'text-slate-500'}">${['🥇', '🥈', '🥉'][i]} ${i + 1}°${lead ? ' · LÍDER' : ''}</div>
                     <div class="font-display font-bold ${lead ? 'text-4xl' : 'text-3xl'} mt-2 text-navy-900 truncate">${escapeHtml(p.name)}</div>
                     <div class="font-display font-bold leading-none mt-4 ${lead ? 'text-7xl sm:text-8xl text-court-600' : 'text-5xl sm:text-6xl text-navy-900'}">${p.totalPoints}<span class="text-lg font-semibold text-slate-500 ml-1.5">pts</span></div>
                     <div class="text-sm text-slate-500 mt-4">${p.totalWins} victorias · ${p.totalLosses} derrotas · ${pct} %</div>
@@ -869,10 +909,8 @@
         }
 
         function posIcon(pos) {
-            if (pos === 1) return '<i class="fa-solid fa-trophy text-amber-500 mr-1"></i>1°';
-            if (pos === 2) return '<i class="fa-solid fa-medal text-slate-400 mr-1"></i>2°';
-            if (pos === 3) return '<i class="fa-solid fa-medal text-orange-700 mr-1"></i>3°';
-            return pos + '°';
+            const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+            return medals[pos] ? `<span class="mr-1" aria-hidden="true">${medals[pos]}</span>${pos}°` : pos + '°';
         }
 
         function renderRankingTable(stats) {
@@ -1047,20 +1085,79 @@
             if (ok) { input.value = ''; showToast(`${name} agregado`); }
         }
 
-        function showToast(message, type = 'success') {
+        function showToast(message, type = 'success', ms = 3000) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white ${type === 'warning' ? 'bg-amber-600' : 'bg-slate-200'}`;
             toast.innerHTML = escapeHtml(message);
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => toast.remove(), ms);
         }
 
         function escapeHtml(str) {
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
+        // ===== Datos guardados para uso sin conexión =====
+        const CACHE_KEY = 'liga_tenis_cache_v1';
+        function saveCache() {
+            try { localStorage.setItem(CACHE_KEY, JSON.stringify(state)); } catch (e) { /* almacenamiento no disponible */ }
+        }
+        function loadCache() {
+            try {
+                const d = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+                if (d && Array.isArray(d.players) && Array.isArray(d.dates) && Array.isArray(d.quickLogs)) { state = d; return true; }
+            } catch (e) { /* caché inválida */ }
+            return false;
+        }
+        window.addEventListener('offline', () => updateSyncBadge('error', 'Sin conexión · datos guardados'));
+        window.addEventListener('online', () => updateSyncBadge('online', 'Conexión restablecida'));
+
+        // ===== Compartir =====
+        async function shareApp() {
+            const lead = computeLeagueStats().rankedPlayers[0];
+            const url = location.origin + location.pathname;
+            const text = lead
+                ? `🎾 Liga de Tenis Rotativa 2026\n🏆 Líder: ${lead.name} (${lead.totalPoints} pts)\nMira el ranking en vivo:`
+                : '🎾 Ranking y resultados de la Liga de Tenis Rotativa 2026';
+            try {
+                if (navigator.share) { await navigator.share({ title: 'Liga de Tenis Rotativa 2026', text, url }); return; }
+                await navigator.clipboard.writeText(`${text} ${url}`);
+                showToast('Enlace copiado 📋');
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
+                showToast('No se pudo compartir.', 'warning');
+            }
+        }
+
+        // ===== Instalar como app =====
+        let deferredInstall = null;
+        const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        function refreshInstallBtn() {
+            const btn = document.getElementById('install-btn');
+            if (btn) btn.classList.toggle('hidden', isStandalone() || !(deferredInstall || isIOS()));
+        }
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; refreshInstallBtn(); });
+        window.addEventListener('appinstalled', () => { deferredInstall = null; refreshInstallBtn(); showToast('App instalada ✅'); });
+        async function installApp() {
+            if (deferredInstall) {
+                deferredInstall.prompt();
+                await deferredInstall.userChoice;
+                deferredInstall = null;
+                refreshInstallBtn();
+            } else if (isIOS()) {
+                showToast('En iPhone/iPad: toca Compartir ⬆️ y luego "Añadir a pantalla de inicio".', 'success', 8000);
+            }
+        }
+
+        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch((err) => console.warn('Service worker no registrado:', err)));
+        }
+
         window.switchTab = switchTab;
+        window.shareApp = shareApp;
+        window.installApp = installApp;
         window.setChartMetric = setChartMetric;
         window.updateScoringRules = updateScoringRules;
         window.handleQuickMatchSubmit = handleQuickMatchSubmit;
@@ -1075,8 +1172,13 @@
         window.addRound = addRound;
 
         window.addEventListener('DOMContentLoaded', () => {
+            const cached = loadCache();
             renderAll();
+            if (cached && !navigator.onLine) updateSyncBadge('error', 'Sin conexión · datos guardados');
             initFirebaseSync();
+            const h = location.hash.replace('#', '');
+            if (['ranking', 'quick', 'rounds'].includes(h)) switchTab(h);
+            refreshInstallBtn();
         });
     </script>
 </body>
