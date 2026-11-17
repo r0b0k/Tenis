@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KLCTHV9N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0f14">
+    <meta name="color-scheme" content="dark">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎾%3C/text%3E%3C/svg%3E">
     <title>Liga de Tenis Rotativa (2026) - Ranking y Registro</title>
     <!-- Tailwind CSS -->
@@ -10,7 +18,7 @@
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome para iconografía deportiva -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js para gráficos de rendimiento -->
@@ -24,9 +32,9 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        court: { 50:'#ecfdf5', 100:'#d1fae5', 200:'#a7f3d0', 500:'#10b981', 600:'#059669', 700:'#047857', 800:'#065f46', 900:'#064e3b' },
-                        navy: { 800:'#27272a', 900:'#18181b', 950:'#09090b' },
-                        tennis: { ball:'#ecfccb', neon:'#a3e635' }
+                        court: { 50:'#1a2410', 100:'#243314', 200:'#3b5217', 500:'#9bc41f', 600:'#c6f432', 700:'#c6f432', 800:'#d9ff6a', 900:'#e4ffa0' },
+                        navy: { 800:'#1b2430', 900:'#131a22', 950:'#0b0f14' },
+                        tennis: { ball:'#e4ffa0', neon:'#c6f432' }
                     }
                 }
             }
@@ -56,13 +64,64 @@
             background: #94a3b8;
         }
 
-        /* ===== Estilo moderno ===== */
-        body { background-color: #f6f7f9; color: #18181b; -webkit-font-smoothing: antialiased; }
-        dialog { background: #fff; color: #18181b; }
-        dialog::backdrop { background: rgba(24,24,27,.45); backdrop-filter: blur(2px); }
-        select:disabled, input:disabled { opacity: .55; cursor: not-allowed; }
-        .card-hover { transition: box-shadow .2s ease, transform .2s ease; }
-        .card-hover:hover { box-shadow: 0 8px 24px -12px rgba(24,24,39,.18); }
+        /* ===== Marcador oscuro ===== */
+        html { color-scheme: dark; }
+        body { background-color: #0b0f14; color: #e8edf2; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+        ::placeholder { color: #6f7f91; }
+        .table-scroll::-webkit-scrollbar-track { background: #131a22; }
+        .table-scroll::-webkit-scrollbar-thumb { background: #2c3947; }
+        dialog { background: #131a22; color: #e8edf2; border: 1px solid #2c3947; }
+        dialog::backdrop { background: rgba(0,0,0,.6); backdrop-filter: blur(3px); }
+        dialog input { background: #0f151c; color: #e8edf2; }
+        select:disabled, input:disabled { opacity: .5; cursor: not-allowed; }
+        .card-hover { transition: box-shadow .2s ease; }
+        .card-hover:hover { box-shadow: 0 10px 28px -14px rgba(0,0,0,.7); }
+        /* superficies */
+        body .rounded-2xl { border-radius: 20px; }
+        body .bg-white { background-color: #131a22; }
+        body .bg-slate-50 { background-color: #0f151c; }
+        body .bg-slate-100, body .bg-zinc-100, body .bg-white\/80 { background-color: #1b2430; }
+        body .bg-slate-200 { background-color: #202a35; }
+        body .border-zinc-200, body .border-slate-200 { border-color: #202a35; }
+        body .border-slate-300 { border-color: #2c3947; }
+        body .border-slate-100, body .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #1b2430; }
+        body .hover\:bg-slate-50:hover, body .hover\:bg-zinc-50:hover, body .hover\:bg-zinc-100:hover { background-color: #1b2430; }
+        body .hover\:bg-slate-200:hover { background-color: #26323f; }
+        /* texto */
+        body .text-navy-900, body .text-zinc-900 { color: #e8edf2; }
+        body .hover\:text-zinc-900:hover { color: #ffffff; }
+        body .text-zinc-700, body .text-slate-700 { color: #c9d3de; }
+        body .text-zinc-600, body .text-slate-600 { color: #a6b3c2; }
+        body .text-zinc-500, body .text-slate-500 { color: #8a98a8; }
+        body .text-slate-400 { color: #6f7f91; }
+        /* acento lima */
+        body .bg-court-600, body .bg-court-700 { background-color: #c6f432; color: #0b0f14; }
+        body .hover\:bg-court-800:hover { background-color: #d9ff6a; }
+        body .bg-lime-200 { background-color: rgba(198,244,50,.15); }
+        body .text-lime-800 { color: #c6f432; }
+        /* semánticos */
+        body .text-emerald-600, body .text-emerald-700, body .text-emerald-800 { color: #5fe3a1; }
+        body .text-rose-600, body .text-rose-700, body .text-rose-800 { color: #ff7a90; }
+        body .text-amber-700 { color: #fbbf24; }
+        body .text-sky-700 { color: #7dd3fc; }
+        body .text-orange-700 { color: #fb923c; }
+        body .bg-emerald-50, body .bg-emerald-50\/70 { background-color: rgba(95,227,161,.10); }
+        body .bg-emerald-100 { background-color: rgba(95,227,161,.16); }
+        body .bg-rose-50, body .bg-rose-50\/70 { background-color: rgba(255,122,144,.10); }
+        body .hover\:bg-rose-100:hover { background-color: rgba(255,122,144,.20); }
+        body .bg-amber-50 { background-color: rgba(251,191,36,.12); }
+        body .bg-amber-100 { background-color: rgba(251,191,36,.18); }
+        body .bg-sky-50 { background-color: rgba(125,211,252,.12); }
+        body .border-emerald-200, body .border-emerald-300 { border-color: rgba(95,227,161,.35); }
+        body .border-rose-200, body .border-rose-300 { border-color: rgba(255,122,144,.35); }
+        body .ring-emerald-200 { --tw-ring-color: rgba(95,227,161,.35); }
+        body .ring-rose-200 { --tw-ring-color: rgba(255,122,144,.35); }
+        body .ring-amber-200 { --tw-ring-color: rgba(251,191,36,.35); }
+        body .ring-sky-200 { --tw-ring-color: rgba(125,211,252,.35); }
+        /* botón deshabilitado */
+        body .disabled\:bg-slate-300:disabled, body .disabled\:hover\:bg-slate-300:disabled:hover { background-color: #2a3441; }
+        body .disabled\:text-slate-500:disabled { color: #6f7f91; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
@@ -84,31 +143,29 @@
     </dialog>
 
     <!-- Encabezado Deportivo -->
-    <header class="bg-white/85 backdrop-blur border-b border-zinc-200 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between gap-3 h-16">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-lime-300 flex items-center justify-center shrink-0"><svg viewBox="0 0 26 26" class="w-6 h-6" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#a3e635" stroke="#18181b" stroke-width="1.5"/><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#18181b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-                    <div class="min-w-0">
-                        <h1 class="text-base sm:text-lg font-bold tracking-tight text-zinc-900 truncate leading-tight">Liga de Tenis Rotativa</h1>
-                        <p class="text-xs text-zinc-500 truncate">Temporada 2026 · Fines de semana</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span id="auth-user" class="hidden text-xs text-zinc-500 truncate max-w-[120px] sm:max-w-[200px]"></span>
-                    <button id="login-btn" type="button" onclick="openLogin()" class="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-700 text-white text-xs font-semibold flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-lock"></i> Iniciar sesión
-                    </button>
-                    <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-3 py-2 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-right-from-bracket"></i> Salir
-                    </button>
+    <header class="sticky top-0 z-40 border-b border-zinc-200" style="background:rgba(11,15,20,.88);backdrop-filter:blur(8px)">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <svg width="34" height="34" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#c6f432"></circle><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#0b0f14" stroke-width="1.6" stroke-linecap="round"></path></svg>
+                <div class="min-w-0">
+                    <h1 class="font-display text-lg sm:text-xl font-bold text-navy-900 truncate leading-tight">Liga de Tenis Rotativa</h1>
+                    <p class="text-xs text-slate-500 truncate">Temporada 2026 · Fines de semana</p>
                 </div>
             </div>
-            <nav class="flex gap-1 pb-3 overflow-x-auto">
-                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-zinc-900 text-white"><i class="fa-solid fa-ranking-star text-xs"></i><span>Ranking</span></button>
-                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-zinc-600 hover:bg-zinc-100"><i class="fa-solid fa-bolt text-xs"></i><span>Registro rápido</span></button>
-                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-zinc-600 hover:bg-zinc-100"><i class="fa-solid fa-calendar-days text-xs"></i><span>Jornadas</span></button>
+            <nav class="order-last w-full md:order-none md:w-auto flex gap-1 bg-white border border-zinc-200 rounded-full p-1 overflow-x-auto">
+                <button id="tab-btn-ranking" onclick="switchTab('ranking')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-court-600"><i class="fa-solid fa-ranking-star text-xs"></i><span>Ranking</span></button>
+                <button id="tab-btn-quick" onclick="switchTab('quick')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900"><i class="fa-solid fa-bolt text-xs"></i><span>Registro</span></button>
+                <button id="tab-btn-rounds" onclick="switchTab('rounds')" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900"><i class="fa-solid fa-calendar-days text-xs"></i><span>Jornadas</span></button>
             </nav>
+            <div class="flex items-center gap-2 shrink-0">
+                <span id="auth-user" class="hidden text-xs text-slate-500 truncate max-w-[120px] sm:max-w-[200px]"></span>
+                <button id="login-btn" type="button" onclick="openLogin()" class="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-zinc-900 text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-lock"></i> Iniciar sesión
+                </button>
+                <button id="logout-btn" type="button" onclick="doLogout()" class="hidden px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-zinc-900 text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Salir
+                </button>
+            </div>
         </div>
     </header>
 
@@ -119,13 +176,40 @@
         <!-- PESTAÑA 1: RANKING GENERAL (TIEMPO REAL)                  -->
         <!-- ========================================================= -->
         <section id="view-ranking" class="space-y-6">
-            
+            <!-- Podio -->
+            <div id="podium" class="grid grid-cols-1 md:grid-cols-[1.3fr_1fr_1fr] gap-4"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><i class="fa-solid fa-chart-line text-court-600"></i> Rendimiento por Jornada</h3>
+                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
+                        </div>
+                        <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
+                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition"><i class="fa-solid fa-trophy mr-1"></i>Victorias</button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><i class="fa-solid fa-star mr-1"></i>Puntos</button>
+                        </div>
+                    </div>
+                    <div class="relative h-72 w-full">
+                        <canvas id="rankingChart"></canvas>
+                    </div>
+                </div>
+                <!-- Últimos partidos -->
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
+                    <h3 class="text-base font-bold text-navy-900 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-court-600"></i> Últimos partidos</h3>
+                    <div id="recent-matches" class="flex flex-col gap-3 text-sm"></div>
+                </div>
+            </div>
+
             <!-- Tabla Principal de Ranking -->
             <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
-                            <i class="fa-solid fa-medal text-emerald-600"></i>
+                            <i class="fa-solid fa-medal text-court-600"></i>
                             Tabla General de Posiciones
                         </h2>
                         <p class="text-xs text-zinc-500">Ordenada automáticamente por Índice de Desempate en tiempo real</p>
@@ -158,29 +242,8 @@
                 </div>
             </div>
 
-            <!-- Sección Inferior: Gráfico de Rendimiento por Jornada + Reglas Configurables -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><i class="fa-solid fa-chart-line text-emerald-600"></i> Rendimiento por Jornada</h3>
-                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
-                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
-                        </div>
-                        <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
-                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition"><i class="fa-solid fa-trophy mr-1"></i>Victorias</button>
-                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><i class="fa-solid fa-star mr-1"></i>Puntos</button>
-                        </div>
-                    </div>
-                    <div class="relative h-72 w-full">
-                        <canvas id="rankingChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Panel de Reglas y Sistema de Puntuación Configurable (1 columna) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between space-y-5">
+            <!-- Panel de Reglas y Sistema de Puntuación Configurable (1 columna) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <div class="flex items-center gap-2 text-navy-900 mb-1">
                             <i class="fa-solid fa-sliders text-court-600"></i>
@@ -218,7 +281,7 @@
                         </p>
                     </div>
                 </div>
-            </div>
+
             <!-- Panel de jugadores (solo editores) -->
             <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
                 <div class="flex items-center gap-2 text-navy-900">
@@ -620,6 +683,8 @@
             const lossIn = document.getElementById('pts-loss-input');
             if (document.activeElement !== winIn) winIn.value = state.ptsWin;
             if (document.activeElement !== lossIn) lossIn.value = state.ptsLoss;
+            renderPodium(stats);
+            renderRecentMatches();
             renderRankingTable(stats);
             renderChart(stats);
             renderQuickMatchForm();
@@ -645,11 +710,11 @@
             const subtitle = document.getElementById('chart-subtitle');
 
             if (metric === 'wins') {
-                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
+                winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition';
                 pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition';
                 subtitle.textContent = 'Evolución de victorias obtenidas por cada jugador a lo largo de las fechas';
             } else {
-                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-white text-court-800 shadow-sm transition';
+                pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition';
                 winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition';
                 subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
             }
@@ -663,7 +728,7 @@
             const labels = state.dates;
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
-            const palette = ['#059669', '#2563eb', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16', '#ec4899'];
+            const palette = ['#c6f432', '#5cc8ff', '#ff9f5a', '#b794f6', '#ff6b8b', '#2dd4bf', '#fbbf24', '#4ade80'];
 
             const lead = stats && stats.rankedPlayers && stats.rankedPlayers[0];
             const chip = document.getElementById('chart-leader');
@@ -681,9 +746,9 @@
                     data: seriesData,
                     borderColor: color,
                     backgroundColor: color,
-                    borderWidth: 2.5,
+                    borderWidth: 3,
                     pointBackgroundColor: color,
-                    pointBorderColor: '#ffffff',
+                    pointBorderColor: '#131a22',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
@@ -703,12 +768,12 @@
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: { position: 'top', align: 'end', labels: { color: '#52525b', font: { weight: '600', size: 12 }, usePointStyle: true, boxWidth: 8 } },
-                        tooltip: { backgroundColor: '#18181b', titleColor: '#fff', bodyColor: '#e4e4e7', padding: 10, cornerRadius: 10, boxPadding: 4 }
+                        legend: { position: 'top', align: 'end', labels: { color: '#c9d3de', font: { weight: '600', size: 12 }, usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { backgroundColor: '#0b0f14', titleColor: '#fff', bodyColor: '#c9d3de', borderColor: '#2c3947', borderWidth: 1, padding: 10, cornerRadius: 10, boxPadding: 4 }
                     },
                     scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0, color: '#71717a' }, grid: { color: '#f4f4f5' }, border: { display: false } },
-                        x: { ticks: { color: '#71717a', maxRotation: 60 }, grid: { display: false }, border: { color: '#e4e4e7' } }
+                        y: { beginAtZero: true, ticks: { precision: 0, color: '#8a98a8' }, grid: { color: '#202a35' }, border: { display: false } },
+                        x: { ticks: { color: '#8a98a8', maxRotation: 60 }, grid: { display: false }, border: { color: '#202a35' } }
                     }
                 }
             });
@@ -780,6 +845,29 @@
             else renderAll();
         }
 
+        function renderPodium(stats) {
+            const el = document.getElementById('podium');
+            if (!el) return;
+            el.innerHTML = stats.rankedPlayers.slice(0, 3).map((p, i) => {
+                const lead = i === 0;
+                const pct = p.winPct.toFixed(1).replace('.', ',');
+                return `<div class="bg-white rounded-3xl p-6 sm:p-7 border ${lead ? 'border-court-600' : 'border-zinc-200'}" ${lead ? 'style="box-shadow:0 12px 40px -18px rgba(198,244,50,.45)"' : ''}>
+                    <div class="text-[11px] font-semibold tracking-[.14em] ${lead ? 'text-court-600' : 'text-slate-500'}">${i + 1}°${lead ? ' · LÍDER' : ''}</div>
+                    <div class="font-display font-bold ${lead ? 'text-4xl' : 'text-3xl'} mt-2 text-navy-900 truncate">${escapeHtml(p.name)}</div>
+                    <div class="font-display font-bold leading-none mt-4 ${lead ? 'text-7xl sm:text-8xl text-court-600' : 'text-5xl sm:text-6xl text-navy-900'}">${p.totalPoints}<span class="text-lg font-semibold text-slate-500 ml-1.5">pts</span></div>
+                    <div class="text-sm text-slate-500 mt-4">${p.totalWins} victorias · ${p.totalLosses} derrotas · ${pct} %</div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderRecentMatches() {
+            const el = document.getElementById('recent-matches');
+            if (!el) return;
+            el.innerHTML = state.quickLogs.length === 0
+                ? '<p class="text-slate-500 italic">Aún no hay partidos registrados.</p>'
+                : state.quickLogs.slice(0, 5).map(l => `<div class="text-slate-700"><strong class="text-navy-900">${escapeHtml(l.winner)}</strong> venció a ${escapeHtml(l.loser)}<div class="text-xs text-slate-500">${escapeHtml(l.date)}${l.time ? ' · ' + escapeHtml(l.time) : ''}</div></div>`).join('');
+        }
+
         function posIcon(pos) {
             if (pos === 1) return '<i class="fa-solid fa-trophy text-amber-500 mr-1"></i>1°';
             if (pos === 2) return '<i class="fa-solid fa-medal text-slate-400 mr-1"></i>2°';
@@ -840,10 +928,10 @@
                 const btn = document.getElementById(`tab-btn-${t}`);
                 if (t === tabName) {
                     view.classList.remove('hidden');
-                    btn.className = 'tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-zinc-900 text-white';
+                    btn.className = 'tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap bg-court-600';
                 } else {
                     view.classList.add('hidden');
-                    btn.className = 'tab-btn px-3.5 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-zinc-600 hover:bg-zinc-100';
+                    btn.className = 'tab-btn px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition whitespace-nowrap text-slate-500 hover:text-zinc-900';
                 }
             });
             if (tabName === 'ranking') renderChart(computeLeagueStats());
@@ -962,7 +1050,7 @@
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white ${type === 'warning' ? 'bg-amber-600' : 'bg-navy-900'}`;
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white ${type === 'warning' ? 'bg-amber-600' : 'bg-slate-200'}`;
             toast.innerHTML = escapeHtml(message);
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
