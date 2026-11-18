@@ -154,6 +154,25 @@
         body .disabled\:bg-slate-300:disabled, body .disabled\:hover\:bg-slate-300:disabled:hover { background-color: #2a3441; }
         body .disabled\:text-slate-500:disabled { color: #6f7f91; }
     </style>
+    
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag.js?id=TU_ID_DE_GA4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // Configuración con pageview manual para SPAs
+  gtag('config', 'TU_ID_DE_GA4', { send_page_view: false });
+
+  // Disparar la vista inicial de la app
+  gtag('event', 'page_view', {
+    page_title: 'Liga de Tenis Rotativa 2026 - Ranking',
+    page_location: window.location.href,
+    page_path: '#ranking'
+  });
+</script>
+
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
     <noscript>
@@ -973,6 +992,13 @@
                 }
             });
             if (tabName === 'ranking') renderChart(computeLeagueStats());
+             // Rastrear navegación virtual en la SPA
+gtag('event', 'page_view', {
+    page_title: `Liga de Tenis - Pestaña ${tabName}`,
+    page_location: location.origin + location.pathname + '#' + tabName,
+    page_path: '#' + tabName
+});
+
         }
 
         async function updateScoringRules() {
@@ -1012,6 +1038,13 @@
 
             const ok = await dbUpdate(changes);
             if (ok) showToast('Partido registrado correctamente');
+            gtag('event', 'registrar_partido', {
+    'event_category': 'Juego',
+    'ganador': state.players[winnerIdx].name,
+    'perdedor': state.players[loserIdx].name,
+    'jornada': state.dates[dateIdx]
+});
+
         }
 
         async function undoQuickLog(id) {
@@ -1128,6 +1161,10 @@
                 if (e && e.name === 'AbortError') return;
                 showToast('No se pudo compartir.', 'warning');
             }
+            gtag('event', 'compartir_liga', {
+    'event_category': 'Social'
+});
+
         }
 
         // ===== Instalar como app =====
