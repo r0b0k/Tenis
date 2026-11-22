@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0b0f14">
+    <meta name="theme-color" content="#f6f3fb">
     <meta name="color-scheme" content="dark">
     <title>Liga de Tenis Rotativa 2026 · Ranking, resultados y registro de partidos</title>
     <meta name="description" content="Ranking en vivo de la Liga de Tenis Rotativa 2026: tabla de posiciones, resultados por jornada y registro de partidos. Instálala como app en tu celular.">
@@ -76,9 +76,9 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        court: { 50:'#1a2410', 100:'#243314', 200:'#3b5217', 500:'#9bc41f', 600:'#c6f432', 700:'#c6f432', 800:'#d9ff6a', 900:'#e4ffa0' },
-                        navy: { 800:'#1b2430', 900:'#131a22', 950:'#0b0f14' },
-                        tennis: { ball:'#e4ffa0', neon:'#c6f432' }
+                        court: { 50:'#f2f9e6', 100:'#e5f3cc', 200:'#d2e8ac', 500:'#a9d27a', 600:'#c8eaa3', 700:'#b4de88', 800:'#4f7f2e', 900:'#365a1f' },
+                        navy: { 800:'#4a4863', 900:'#34324a', 950:'#262538' },
+                        tennis: { ball:'#e5f3cc', neon:'#c8eaa3' }
                     }
                 }
             }
@@ -108,64 +108,67 @@
             background: #94a3b8;
         }
 
-        /* ===== Marcador oscuro ===== */
-        html { color-scheme: dark; }
-        body { background-color: #0b0f14; color: #e8edf2; -webkit-font-smoothing: antialiased; }
+        /* ===== Tema pastel claro ===== */
+        html { color-scheme: light; }
+        body { background: linear-gradient(180deg, #f6f3fb 0%, #fbf6f4 100%) fixed; color: #34324a; -webkit-font-smoothing: antialiased; }
         h1, h2, h3, .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
-        ::placeholder { color: #6f7f91; }
-        .table-scroll::-webkit-scrollbar-track { background: #131a22; }
-        .table-scroll::-webkit-scrollbar-thumb { background: #2c3947; }
-        dialog { background: #131a22; color: #e8edf2; border: 1px solid #2c3947; }
-        dialog::backdrop { background: rgba(0,0,0,.6); backdrop-filter: blur(3px); }
-        dialog input { background: #0f151c; color: #e8edf2; }
+        ::placeholder { color: #9a98b0; }
+        .table-scroll::-webkit-scrollbar-track { background: #f0ebf8; }
+        .table-scroll::-webkit-scrollbar-thumb { background: #d4cbe8; }
+        dialog { background: #ffffff; color: #34324a; border: 1px solid #e9e3f4; }
+        dialog::backdrop { background: rgba(70,60,100,.25); backdrop-filter: blur(3px); }
+        dialog input { background: #faf8fe; color: #34324a; }
         select:disabled, input:disabled { opacity: .5; cursor: not-allowed; }
         .card-hover { transition: box-shadow .2s ease; }
-        .card-hover:hover { box-shadow: 0 10px 28px -14px rgba(0,0,0,.7); }
+        .card-hover:hover { box-shadow: 0 10px 28px -14px rgba(120,100,170,.35); }
         /* superficies */
         body .rounded-2xl { border-radius: 20px; }
-        body .bg-white { background-color: #131a22; }
-        body .bg-slate-50 { background-color: #0f151c; }
-        body .bg-slate-100, body .bg-zinc-100, body .bg-white\/80 { background-color: #1b2430; }
-        body .bg-slate-200 { background-color: #202a35; }
-        body .border-zinc-200, body .border-slate-200 { border-color: #202a35; }
-        body .border-slate-300 { border-color: #2c3947; }
-        body .border-slate-100, body .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #1b2430; }
-        body .hover\:bg-slate-50:hover, body .hover\:bg-zinc-50:hover, body .hover\:bg-zinc-100:hover { background-color: #1b2430; }
-        body .hover\:bg-slate-200:hover { background-color: #26323f; }
+        body .bg-white { background-color: #ffffff; }
+        body .shadow-sm { box-shadow: 0 2px 14px -6px rgba(120,100,170,.22); }
+        body .bg-slate-50 { background-color: #f9f6fd; }
+        body .bg-slate-100, body .bg-zinc-100, body .bg-white\/80 { background-color: #f1ecf9; }
+        body .bg-slate-200 { background-color: #e9e2f4; }
+        body .border-zinc-200, body .border-slate-200 { border-color: #ebe5f5; }
+        body .border-slate-300 { border-color: #d9d0ea; }
+        body .border-slate-100, body .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #f1ecf9; }
+        body .hover\:bg-slate-50:hover, body .hover\:bg-zinc-50:hover, body .hover\:bg-zinc-100:hover { background-color: #f6f1fc; }
+        body .hover\:bg-slate-200:hover { background-color: #e2d9f1; }
         /* texto */
-        body .text-navy-900, body .text-zinc-900 { color: #e8edf2; }
-        body .hover\:text-zinc-900:hover { color: #ffffff; }
-        body .text-zinc-700, body .text-slate-700 { color: #c9d3de; }
-        body .text-zinc-600, body .text-slate-600 { color: #a6b3c2; }
-        body .text-zinc-500, body .text-slate-500 { color: #8a98a8; }
-        body .text-slate-400 { color: #6f7f91; }
-        /* acento lima */
-        body .bg-court-600, body .bg-court-700 { background-color: #c6f432; color: #0b0f14; }
-        body .hover\:bg-court-800:hover { background-color: #d9ff6a; }
-        body .bg-lime-200 { background-color: rgba(198,244,50,.15); }
-        body .text-lime-800 { color: #c6f432; }
-        /* semánticos */
-        body .text-emerald-600, body .text-emerald-700, body .text-emerald-800 { color: #5fe3a1; }
-        body .text-rose-600, body .text-rose-700, body .text-rose-800 { color: #ff7a90; }
-        body .text-amber-700 { color: #fbbf24; }
-        body .text-sky-700 { color: #7dd3fc; }
-        body .text-orange-700 { color: #fb923c; }
-        body .bg-emerald-50, body .bg-emerald-50\/70 { background-color: rgba(95,227,161,.10); }
-        body .bg-emerald-100 { background-color: rgba(95,227,161,.16); }
-        body .bg-rose-50, body .bg-rose-50\/70 { background-color: rgba(255,122,144,.10); }
-        body .hover\:bg-rose-100:hover { background-color: rgba(255,122,144,.20); }
-        body .bg-amber-50 { background-color: rgba(251,191,36,.12); }
-        body .bg-amber-100 { background-color: rgba(251,191,36,.18); }
-        body .bg-sky-50 { background-color: rgba(125,211,252,.12); }
-        body .border-emerald-200, body .border-emerald-300 { border-color: rgba(95,227,161,.35); }
-        body .border-rose-200, body .border-rose-300 { border-color: rgba(255,122,144,.35); }
-        body .ring-emerald-200 { --tw-ring-color: rgba(95,227,161,.35); }
-        body .ring-rose-200 { --tw-ring-color: rgba(255,122,144,.35); }
-        body .ring-amber-200 { --tw-ring-color: rgba(251,191,36,.35); }
-        body .ring-sky-200 { --tw-ring-color: rgba(125,211,252,.35); }
+        body .text-navy-900, body .text-zinc-900 { color: #34324a; }
+        body .hover\:text-zinc-900:hover { color: #34324a; }
+        body .text-zinc-700, body .text-slate-700 { color: #4a4863; }
+        body .text-zinc-600, body .text-slate-600 { color: #5f5d79; }
+        body .text-zinc-500, body .text-slate-500 { color: #6b6985; }
+        body .text-slate-400 { color: #9a98b0; }
+        /* acento verde pastel */
+        body .bg-court-600, body .bg-court-700 { background-color: #c8eaa3; color: #2f5233; }
+        body .hover\:bg-court-800:hover { background-color: #b4de88; }
+        body .text-court-600, body .text-court-700 { color: #4f7f2e; }
+        body .bg-lime-200 { background-color: #e5f3cc; }
+        body .text-lime-800 { color: #4f7f2e; }
+        body .tab-btn.bg-court-600 { box-shadow: 0 2px 10px -4px rgba(120,170,80,.55); }
+        /* semánticos pastel */
+        body .text-emerald-600, body .text-emerald-700, body .text-emerald-800 { color: #2f8a5f; }
+        body .text-rose-600, body .text-rose-700, body .text-rose-800 { color: #c2415c; }
+        body .text-amber-700 { color: #a4650d; }
+        body .text-sky-700 { color: #2f7ba8; }
+        body .text-orange-700 { color: #c2611f; }
+        body .bg-emerald-50, body .bg-emerald-50\/70 { background-color: #e9f8f0; }
+        body .bg-emerald-100 { background-color: #d5f1e3; }
+        body .bg-rose-50, body .bg-rose-50\/70 { background-color: #fdeef2; }
+        body .hover\:bg-rose-100:hover { background-color: #fadce5; }
+        body .bg-amber-50 { background-color: #fff6df; }
+        body .bg-amber-100 { background-color: #ffecbd; }
+        body .bg-sky-50 { background-color: #e8f5fd; }
+        body .border-emerald-200, body .border-emerald-300 { border-color: #bfe8d2; }
+        body .border-rose-200, body .border-rose-300 { border-color: #f6c9d6; }
+        body .ring-emerald-200 { --tw-ring-color: #bfe8d2; }
+        body .ring-rose-200 { --tw-ring-color: #f6c9d6; }
+        body .ring-amber-200 { --tw-ring-color: #f7dc9a; }
+        body .ring-sky-200 { --tw-ring-color: #bfe2f5; }
         /* botón deshabilitado */
-        body .disabled\:bg-slate-300:disabled, body .disabled\:hover\:bg-slate-300:disabled:hover { background-color: #2a3441; }
-        body .disabled\:text-slate-500:disabled { color: #6f7f91; }
+        body .disabled\:bg-slate-300:disabled, body .disabled\:hover\:bg-slate-300:disabled:hover { background-color: #e4def0; }
+        body .disabled\:text-slate-500:disabled { color: #8d8ba6; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
@@ -173,7 +176,7 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P7MKB5KJ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <noscript>
-        <div style="padding:24px;font-family:sans-serif;background:#131a22;color:#e8edf2;text-align:center">
+        <div style="padding:24px;font-family:sans-serif;background:#f6f3fb;color:#34324a;text-align:center">
             <h1>🎾 Liga de Tenis Rotativa 2026</h1>
             <p>Ranking en vivo, resultados por jornada y registro de partidos. Activa JavaScript para ver los datos de la liga.</p>
         </div>
@@ -196,10 +199,10 @@
     </dialog>
 
     <!-- Encabezado Deportivo -->
-    <header class="sticky top-0 z-40 border-b border-zinc-200" style="background:rgba(11,15,20,.88);backdrop-filter:blur(8px)">
+    <header class="sticky top-0 z-40 border-b border-zinc-200" style="background:rgba(251,248,255,.88);backdrop-filter:blur(8px)">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
-                <svg width="34" height="34" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#c6f432"></circle><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#0b0f14" stroke-width="1.6" stroke-linecap="round"></path></svg>
+                <svg width="34" height="34" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="#d3efb0"></circle><path d="M4.5 6.5c5 3 5 10 0 13M21.5 6.5c-5 3-5 10 0 13" fill="none" stroke="#6d9a48" stroke-width="1.6" stroke-linecap="round"></path></svg>
                 <div class="min-w-0">
                     <h1 class="font-display text-lg sm:text-xl font-bold text-navy-900 truncate leading-tight">Liga de Tenis Rotativa</h1>
                     <p class="text-xs text-slate-500 truncate">Temporada 2026 · Fines de semana</p>
@@ -231,34 +234,6 @@
         <!-- PESTAÑA 1: RANKING GENERAL (TIEMPO REAL)                  -->
         <!-- ========================================================= -->
         <section id="view-ranking" class="space-y-6">
-            <!-- Podio -->
-            <div id="podium" class="grid grid-cols-1 md:grid-cols-[1.3fr_1fr_1fr] gap-4"></div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">📈</span> Rendimiento por Jornada</h3>
-                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
-                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
-                        </div>
-                        <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
-                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition"><span class="mr-1" aria-hidden="true">🏆</span>Victorias</button>
-                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><span class="mr-1" aria-hidden="true">⭐</span>Puntos</button>
-                        </div>
-                    </div>
-                    <div class="relative h-72 w-full">
-                        <canvas id="rankingChart"></canvas>
-                    </div>
-                </div>
-                <!-- Últimos partidos -->
-                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
-                    <h3 class="text-base font-bold text-navy-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">🕘</span> Últimos partidos</h3>
-                    <div id="recent-matches" class="flex flex-col gap-3 text-sm"></div>
-                </div>
-            </div>
-
             <!-- Tabla Principal de Ranking -->
             <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -297,6 +272,46 @@
                 </div>
             </div>
 
+            <!-- Podio -->
+            <div id="podium" class="grid grid-cols-1 md:grid-cols-[1.3fr_1fr_1fr] gap-4"></div>
+
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">📈</span> Rendimiento por Jornada</h3>
+                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
+                        </div>
+                        <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
+                            <button type="button" id="chart-mode-wins" onclick="setChartMetric('wins')" class="px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition"><span class="mr-1" aria-hidden="true">🏆</span>Victorias</button>
+                            <button type="button" id="chart-mode-points" onclick="setChartMetric('points')" class="px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition"><span class="mr-1" aria-hidden="true">⭐</span>Puntos</button>
+                        </div>
+                    </div>
+                    <div class="relative h-72 w-full">
+                        <canvas id="rankingChart"></canvas>
+                    </div>
+                </div>
+                <!-- Últimos partidos -->
+                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
+                    <h3 class="text-base font-bold text-navy-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">🕘</span> Últimos partidos</h3>
+                    <div id="recent-matches" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm"></div>
+                </div>
+            </div>
+
+            <!-- Panel de jugadores (solo editores) -->
+            <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
+                <div class="flex items-center gap-2 text-navy-900">
+                    <span class="text-court-600" aria-hidden="true">👥</span>
+                    <h3 class="text-base font-bold">Jugadores</h3>
+                </div>
+                <ul id="players-list" class="divide-y divide-slate-100 text-sm"></ul>
+                <form onsubmit="addPlayer(event)" class="flex gap-2">
+                    <input id="new-player-name" type="text" maxlength="30" required placeholder="Nombre del nuevo jugador" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold">Agregar</button>
+                </form>
+            </div>
             <!-- Panel de Reglas y Sistema de Puntuación Configurable (1 columna) -->
                 <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -337,18 +352,6 @@
                     </div>
                 </div>
 
-            <!-- Panel de jugadores (solo editores) -->
-            <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
-                <div class="flex items-center gap-2 text-navy-900">
-                    <span class="text-court-600" aria-hidden="true">👥</span>
-                    <h3 class="text-base font-bold">Jugadores</h3>
-                </div>
-                <ul id="players-list" class="divide-y divide-slate-100 text-sm"></ul>
-                <form onsubmit="addPlayer(event)" class="flex gap-2">
-                    <input id="new-player-name" type="text" maxlength="30" required placeholder="Nombre del nuevo jugador" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm">
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold">Agregar</button>
-                </form>
-            </div>
         </section>
 
         <!-- ========================================================= -->
@@ -785,7 +788,7 @@
             const labels = state.dates;
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
-            const palette = ['#c6f432', '#5cc8ff', '#ff9f5a', '#b794f6', '#ff6b8b', '#2dd4bf', '#fbbf24', '#4ade80'];
+            const palette = ['#7fc77f', '#6bb7e6', '#f2a36b', '#a98be0', '#ee8ba6', '#5cc9bd', '#e6b84c', '#9ccc65'];
 
             const lead = stats && stats.rankedPlayers && stats.rankedPlayers[0];
             const chip = document.getElementById('chart-leader');
@@ -805,7 +808,7 @@
                     backgroundColor: color,
                     borderWidth: 3,
                     pointBackgroundColor: color,
-                    pointBorderColor: '#131a22',
+                    pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
@@ -825,12 +828,12 @@
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: { position: 'top', align: 'end', labels: { color: '#c9d3de', font: { weight: '600', size: 12 }, usePointStyle: true, boxWidth: 8 } },
-                        tooltip: { backgroundColor: '#0b0f14', titleColor: '#fff', bodyColor: '#c9d3de', borderColor: '#2c3947', borderWidth: 1, padding: 10, cornerRadius: 10, boxPadding: 4 }
+                        legend: { position: 'top', align: 'end', labels: { color: '#5f5d79', font: { weight: '600', size: 12 }, usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { backgroundColor: '#ffffff', titleColor: '#34324a', bodyColor: '#5f5d79', borderColor: '#e0d8f0', borderWidth: 1, padding: 10, cornerRadius: 10, boxPadding: 4 }
                     },
                     scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0, color: '#8a98a8' }, grid: { color: '#202a35' }, border: { display: false } },
-                        x: { ticks: { color: '#8a98a8', maxRotation: 60 }, grid: { display: false }, border: { color: '#202a35' } }
+                        y: { beginAtZero: true, ticks: { precision: 0, color: '#6b6985' }, grid: { color: '#eee9f7' }, border: { display: false } },
+                        x: { ticks: { color: '#6b6985', maxRotation: 60 }, grid: { display: false }, border: { color: '#e4dcf1' } }
                     }
                 }
             });
@@ -908,10 +911,10 @@
             el.innerHTML = stats.rankedPlayers.slice(0, 3).map((p, i) => {
                 const lead = i === 0;
                 const pct = p.winPct.toFixed(1).replace('.', ',');
-                return `<div class="bg-white rounded-3xl p-6 sm:p-7 border ${lead ? 'border-court-600' : 'border-zinc-200'}" ${lead ? 'style="box-shadow:0 12px 40px -18px rgba(198,244,50,.45)"' : ''}>
-                    <div class="text-[11px] font-semibold tracking-[.14em] ${lead ? 'text-court-600' : 'text-slate-500'}">${['🥇', '🥈', '🥉'][i]} ${i + 1}°${lead ? ' · LÍDER' : ''}</div>
+                return `<div class="${lead ? 'bg-court-50' : 'bg-white'} rounded-3xl p-6 sm:p-7 border ${lead ? 'border-court-500' : 'border-zinc-200'}" ${lead ? 'style="box-shadow:0 12px 34px -16px rgba(120,170,80,.45)"' : ''}>
+                    <div class="text-[11px] font-semibold tracking-[.14em] ${lead ? 'text-court-900' : 'text-slate-500'}">${['🥇', '🥈', '🥉'][i]} ${i + 1}°${lead ? ' · LÍDER' : ''}</div>
                     <div class="font-display font-bold ${lead ? 'text-4xl' : 'text-3xl'} mt-2 text-navy-900 truncate">${escapeHtml(p.name)}</div>
-                    <div class="font-display font-bold leading-none mt-4 ${lead ? 'text-7xl sm:text-8xl text-court-600' : 'text-5xl sm:text-6xl text-navy-900'}">${p.totalPoints}<span class="text-lg font-semibold text-slate-500 ml-1.5">pts</span></div>
+                    <div class="font-display font-bold leading-none mt-4 ${lead ? 'text-7xl sm:text-8xl text-court-800' : 'text-5xl sm:text-6xl text-navy-900'}">${p.totalPoints}<span class="text-lg font-semibold text-slate-500 ml-1.5">pts</span></div>
                     <div class="text-sm text-slate-500 mt-4">${p.totalWins} victorias · ${p.totalLosses} derrotas · ${pct} %</div>
                 </div>`;
             }).join('');
@@ -921,8 +924,8 @@
             const el = document.getElementById('recent-matches');
             if (!el) return;
             el.innerHTML = state.quickLogs.length === 0
-                ? '<p class="text-slate-500 italic">Aún no hay partidos registrados.</p>'
-                : state.quickLogs.slice(0, 5).map(l => `<div class="text-slate-700"><strong class="text-navy-900">${escapeHtml(l.winner)}</strong> venció a ${escapeHtml(l.loser)}<div class="text-xs text-slate-500">${escapeHtml(l.date)}${l.time ? ' · ' + escapeHtml(l.time) : ''}</div></div>`).join('');
+                ? '<p class="text-slate-500 italic sm:col-span-2 lg:col-span-5">Aún no hay partidos registrados.</p>'
+                : state.quickLogs.slice(0, 5).map(l => `<div class="text-slate-700 rounded-xl bg-slate-50 border border-zinc-200 p-3"><strong class="text-navy-900">${escapeHtml(l.winner)}</strong> venció a ${escapeHtml(l.loser)}<div class="text-xs text-slate-500">${escapeHtml(l.date)}${l.time ? ' · ' + escapeHtml(l.time) : ''}</div></div>`).join('');
         }
 
         function posIcon(pos) {
@@ -1127,7 +1130,7 @@
         function showToast(message, type = 'success', ms = 3000) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold text-white ${type === 'warning' ? 'bg-amber-600' : 'bg-slate-200'}`;
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-bold ring-1 ${type === 'warning' ? 'bg-amber-100 text-amber-700 ring-amber-200' : 'bg-white text-emerald-700 ring-emerald-200'}`;
             toast.innerHTML = escapeHtml(message);
             container.appendChild(toast);
             setTimeout(() => toast.remove(), ms);
