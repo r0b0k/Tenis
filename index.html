@@ -12,6 +12,19 @@
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://r0b0k.github.io/Tenis/">
 
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-P7MKB5KJ');
+        // Ayudante para eventos personalizados (se leen en GTM como activadores "Evento personalizado")
+        window.track = function (name, params) {
+            try { window.dataLayer.push(Object.assign({ event: name }, params || {})); } catch (e) { /* sin analítica */ }
+        };
+    </script>
+    <!-- End Google Tag Manager -->
+
     <!-- Compartir: Open Graph (WhatsApp, Facebook, LinkedIn, Telegram) -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Liga de Tenis Rotativa">
@@ -154,27 +167,11 @@
         body .disabled\:bg-slate-300:disabled, body .disabled\:hover\:bg-slate-300:disabled:hover { background-color: #2a3441; }
         body .disabled\:text-slate-500:disabled { color: #6f7f91; }
     </style>
-    
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag.js?id=TU_ID_DE_GA4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  // Configuración con pageview manual para SPAs
-  gtag('config', 'TU_ID_DE_GA4', { send_page_view: false });
-
-  // Disparar la vista inicial de la app
-  gtag('event', 'page_view', {
-    page_title: 'Liga de Tenis Rotativa 2026 - Ranking',
-    page_location: window.location.href,
-    page_path: '#ranking'
-  });
-</script>
-
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P7MKB5KJ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <noscript>
         <div style="padding:24px;font-family:sans-serif;background:#131a22;color:#e8edf2;text-align:center">
             <h1>🎾 Liga de Tenis Rotativa 2026</h1>
@@ -504,7 +501,7 @@
         const leagueRef = ref(db, 'liga_tenis/temporada_2026');
 
         const DEFAULT_DATES = [
-            'Dom 15-Nov-2026', 'Sáb 21-Nov-2026', 'Dom 22-Nov-2026', 'Sáb 28-Nov-2026', 'Dom 29-Nov-2026',
+            'Dom 22-Nov-2026', 'Sáb 28-Nov-2026', 'Dom 29-Nov-2026',
             'Sáb 05-Dic-2026', 'Dom 06-Dic-2026', 'Sáb 12-Dic-2026', 'Dom 13-Dic-2026', 'Sáb 19-Dic-2026',
             'Dom 20-Dic-2026', 'Sáb 26-Dic-2026', 'Dom 27-Dic-2026'
         ];
@@ -677,6 +674,7 @@
                 document.getElementById('login-pass').value = '';
                 document.getElementById('login-dialog').close();
                 showToast('Sesión iniciada');
+                window.track('login', { method: 'email' });
             } catch (err) {
                 errEl.textContent = 'Correo o contraseña incorrectos.';
                 errEl.classList.remove('hidden');
@@ -900,7 +898,7 @@
             if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
             const val = Math.min(999, Math.max(0, parseInt(rawVal, 10) || 0));
             const ok = await dbUpdate({ [`players/${playerIdx}/${type}/${dateIdx}`]: val });
-            if (ok) showToast(`${state.players[playerIdx].name} actualizado con éxito`);
+            if (ok) { showToast(`${state.players[playerIdx].name} actualizado con éxito`); window.track('round_edited', { round: state.dates[dateIdx], field: type }); }
             else renderAll();
         }
 
@@ -979,7 +977,17 @@
                     </div>`).join('');
         }
 
+        let currentTab = 'ranking';
         function switchTab(tabName) {
+            if (tabName !== currentTab) {
+                currentTab = tabName;
+                try { history.replaceState(null, '', '#' + tabName); } catch (e) { /* ignorar */ }
+                const titles = { ranking: 'Ranking', quick: 'Registro', rounds: 'Jornadas' };
+                window.track('virtual_page_view', {
+                    page_title: 'Liga de Tenis · ' + (titles[tabName] || tabName),
+                    page_location: location.origin + location.pathname + '#' + tabName
+                });
+            }
             ['ranking', 'quick', 'rounds'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -992,13 +1000,6 @@
                 }
             });
             if (tabName === 'ranking') renderChart(computeLeagueStats());
-             // Rastrear navegación virtual en la SPA
-gtag('event', 'page_view', {
-    page_title: `Liga de Tenis - Pestaña ${tabName}`,
-    page_location: location.origin + location.pathname + '#' + tabName,
-    page_path: '#' + tabName
-});
-
         }
 
         async function updateScoringRules() {
@@ -1037,26 +1038,30 @@ gtag('event', 'page_view', {
             state.quickLogs.slice(49).forEach(l => { changes[`quickLogs/${l.id}`] = null; });
 
             const ok = await dbUpdate(changes);
-            if (ok) showToast('Partido registrado correctamente');
-            gtag('event', 'registrar_partido', {
-    'event_category': 'Juego',
-    'ganador': state.players[winnerIdx].name,
-    'perdedor': state.players[loserIdx].name,
-    'jornada': state.dates[dateIdx]
-});
-
+            if (ok) { showToast('Partido registrado correctamente'); window.track('match_registered', { round: state.dates[dateIdx] }); }
         }
 
         async function undoQuickLog(id) {
             const log = state.quickLogs.find(l => l.id === id);
             if (!log || log.winnerIdx === undefined) return;
-            if (!confirm(`¿Deshacer: ${log.winner} venció a ${log.loser} (${log.date})?`)) return;
-            const ok = await dbUpdate({
-                [`players/${log.winnerIdx}/wins/${log.dateIdx}`]: increment(-1),
-                [`players/${log.loserIdx}/losses/${log.dateIdx}`]: increment(-1),
-                [`quickLogs/${id}`]: null
-            });
-            showToast(ok ? 'Partido deshecho' : 'No se pudo deshacer (¿editaste esa jornada a mano?)', ok ? 'success' : 'warning');
+            const curW = Number(state.players[log.winnerIdx]?.wins?.[log.dateIdx]) || 0;
+            const curL = Number(state.players[log.loserIdx]?.losses?.[log.dateIdx]) || 0;
+            let changes;
+            if (curW < 1 || curL < 1) {
+                // La jornada se editó a mano: restar dejaría valores negativos. Solo se quita del historial.
+                if (!confirm('Esa jornada fue editada a mano y ya no tiene ese resultado en los conteos.\n¿Quitar solo el registro del historial (sin modificar conteos)?')) return;
+                changes = { [`quickLogs/${id}`]: null };
+            } else {
+                if (!confirm(`¿Deshacer: ${log.winner} venció a ${log.loser} (${log.date})?`)) return;
+                changes = {
+                    [`players/${log.winnerIdx}/wins/${log.dateIdx}`]: increment(-1),
+                    [`players/${log.loserIdx}/losses/${log.dateIdx}`]: increment(-1),
+                    [`quickLogs/${id}`]: null
+                };
+            }
+            const ok = await dbUpdate(changes);
+            if (ok) window.track('match_undone', { round: log.date });
+            showToast(ok ? 'Registro deshecho' : 'No se pudo deshacer.', ok ? 'success' : 'warning');
         }
 
         function renderPlayersList() {
@@ -1097,6 +1102,7 @@ gtag('event', 'page_view', {
             if (ok) {
                 input.value = '';
                 showToast(`Jornada ${label} agregada`);
+                window.track('round_added', { round: label });
             }
         }
 
@@ -1154,17 +1160,14 @@ gtag('event', 'page_view', {
                 ? `🎾 Liga de Tenis Rotativa 2026\n🏆 Líder: ${lead.name} (${lead.totalPoints} pts)\nMira el ranking en vivo:`
                 : '🎾 Ranking y resultados de la Liga de Tenis Rotativa 2026';
             try {
-                if (navigator.share) { await navigator.share({ title: 'Liga de Tenis Rotativa 2026', text, url }); return; }
+                if (navigator.share) { await navigator.share({ title: 'Liga de Tenis Rotativa 2026', text, url }); window.track('share', { method: 'native' }); return; }
                 await navigator.clipboard.writeText(`${text} ${url}`);
+                window.track('share', { method: 'copy_link' });
                 showToast('Enlace copiado 📋');
             } catch (e) {
                 if (e && e.name === 'AbortError') return;
                 showToast('No se pudo compartir.', 'warning');
             }
-            gtag('event', 'compartir_liga', {
-    'event_category': 'Social'
-});
-
         }
 
         // ===== Instalar como app =====
@@ -1176,7 +1179,7 @@ gtag('event', 'page_view', {
             if (btn) btn.classList.toggle('hidden', isStandalone() || !(deferredInstall || isIOS()));
         }
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; refreshInstallBtn(); });
-        window.addEventListener('appinstalled', () => { deferredInstall = null; refreshInstallBtn(); showToast('App instalada ✅'); });
+        window.addEventListener('appinstalled', () => { window.track('install_app'); deferredInstall = null; refreshInstallBtn(); showToast('App instalada ✅'); });
         async function installApp() {
             if (deferredInstall) {
                 deferredInstall.prompt();
