@@ -568,17 +568,22 @@
                 dbIsEmpty = false;
                 const data = snapshot.val();
                 if (data && Array.isArray(data.players) && Array.isArray(data.dates)) {
-                    state = {
-                        ptsWin: Number(data.ptsWin ?? 2),
-                        ptsLoss: Number(data.ptsLoss ?? 1),
-                        dates: data.dates,
-                        players: data.players.map(p => ({
-                            ...p,
-                            wins: Array.isArray(p.wins) ? p.wins : Array(data.dates.length).fill(0),
-                            losses: Array.isArray(p.losses) ? p.losses : Array(data.dates.length).fill(0)
-                        })),
-                        quickLogs: normalizeQuickLogs(data.quickLogs)
-                    };
+                    // Índices de fechas válidas (descarta huecos null/vacíos)
+const keep = [];
+data.dates.forEach((d, i) => { if (d !== null && d !== undefined && String(d).trim() !== '') keep.push(i); });
+const pick = (arr) => keep.map(i => Number(Array.isArray(arr) ? arr[i] : 0) || 0);
+
+state = {
+    ptsWin: Number(data.ptsWin ?? 2),
+    ptsLoss: Number(data.ptsLoss ?? 1),
+    dates: keep.map(i => data.dates[i]),
+    players: data.players.filter(Boolean).map(p => ({
+        ...p,
+        wins: pick(p.wins),
+        losses: pick(p.losses)
+    })),
+    quickLogs: normalizeQuickLogs(data.quickLogs)
+};
                     renderAll();
                     saveCache();
                     updateSyncBadge('online', 'Sincronizado en tiempo real');
