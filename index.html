@@ -169,6 +169,15 @@
         /* botón deshabilitado */
         body .disabled\:bg-slate-300:disabled, body .disabled\:hover\:bg-slate-300:disabled:hover { background-color: #e4def0; }
         body .disabled\:text-slate-500:disabled { color: #8d8ba6; }
+
+        /* ===== Cajas por categoría (acento de color) ===== */
+        body .tone-violet { background: linear-gradient(180deg,#f4effd 0,#ffffff 110px); border-top: 4px solid #c3b1ec; }
+        body .tone-sky    { background: linear-gradient(180deg,#eaf6fd 0,#ffffff 110px); border-top: 4px solid #a6d4f0; }
+        body .tone-peach  { background: linear-gradient(180deg,#fff2e8 0,#ffffff 110px); border-top: 4px solid #f5bd94; }
+        body .tone-mint   { background: linear-gradient(180deg,#e8f8f1 0,#ffffff 110px); border-top: 4px solid #98d9bf; }
+        body .tone-amber  { background: linear-gradient(180deg,#fff6df 0,#ffffff 110px); border-top: 4px solid #f1d076; }
+        body .tone-lime   { background: linear-gradient(180deg,#f2f9e4 0,#ffffff 110px); border-top: 4px solid #bddf8c; }
+        body .tone-slate  { background: linear-gradient(180deg,#f1eff7 0,#ffffff 110px); border-top: 4px solid #d3cde3; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-court-600 selection:text-white">
@@ -183,7 +192,7 @@
     </noscript>
 
     <!-- Notificación Toast Flotante -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none w-[92vw] max-w-sm text-center" style="top: calc(env(safe-area-inset-top, 0px) + 12px);"></div>
     <!-- Ventana de inicio de sesión -->
     <dialog id="login-dialog" class="rounded-2xl p-0 shadow-2xl backdrop:bg-black/50 w-[90vw] max-w-sm">
         <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
@@ -235,7 +244,7 @@
         <!-- ========================================================= -->
         <section id="view-ranking" class="space-y-6">
             <!-- Tabla Principal de Ranking -->
-            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
+            <div class="tone-violet bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-lg font-bold text-zinc-900 flex items-center gap-2">
@@ -262,6 +271,7 @@
                                 <th class="py-3.5 px-4 text-center text-rose-700">Derrotas</th>
                                 <th class="py-3.5 px-4 text-center">% Victorias</th>
                                 <th class="py-3.5 px-4 text-center">% Efectividad Pts</th>
+                                <th class="py-3.5 px-4 text-center bg-sky-50 text-sky-700 whitespace-nowrap">Mejor día</th>
                                 <th class="py-3.5 px-4 text-right">Índice Desempate</th>
                             </tr>
                         </thead>
@@ -277,7 +287,7 @@
 
             <div class="grid grid-cols-1 gap-6">
                 <!-- Gráfico de Rendimiento por Jornada (2 columnas) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
+                <div class="tone-sky bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col justify-between">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div>
                             <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">📈</span> Rendimiento por Jornada</h3>
@@ -294,14 +304,14 @@
                     </div>
                 </div>
                 <!-- Últimos partidos -->
-                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
+                <div class="tone-peach bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
                     <h3 class="text-base font-bold text-navy-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">🕘</span> Últimos partidos</h3>
                     <div id="recent-matches" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm"></div>
                 </div>
             </div>
 
             <!-- Panel de jugadores (solo editores) -->
-            <div data-admin-only class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
+            <div data-admin-only class="hidden tone-mint bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4">
                 <div class="flex items-center gap-2 text-navy-900">
                     <span class="text-court-600" aria-hidden="true">👥</span>
                     <h3 class="text-base font-bold">Jugadores</h3>
@@ -313,7 +323,7 @@
                 </form>
             </div>
             <!-- Panel de Reglas y Sistema de Puntuación Configurable (1 columna) -->
-                <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="tone-amber bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <div class="flex items-center gap-2 text-navy-900 mb-1">
                             <span class="text-court-600" aria-hidden="true">⚙️</span>
@@ -358,7 +368,7 @@
         <!-- PESTAÑA 2: REGISTRO RÁPIDO DE PARTIDO (1 VS 1)            -->
         <!-- ========================================================= -->
         <section id="view-quick" class="hidden max-w-3xl mx-auto space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
+            <div class="tone-lime bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden">
                 <div class="px-6 py-5 border-b border-zinc-200">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-lime-200 text-lime-800 flex items-center justify-center shrink-0">
@@ -412,7 +422,7 @@
             </div>
 
             <!-- Historial Reciente de Partidos Rápidos de la Sesión -->
-            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
+            <div class="tone-violet bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-sm font-bold text-navy-900">Últimos partidos anotados desde el Asistente</h3>
                     <span id="quick-log-count" class="text-xs font-semibold text-slate-500">0 registros</span>
@@ -427,7 +437,22 @@
         <!-- PESTAÑA 3: RESULTADOS POR JORNADA (EDITABLE)              -->
         <!-- ========================================================= -->
         <section id="view-rounds" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <!-- Agregar nueva jornada (solo editores) -->
+            <form id="round-add-form" data-admin-only onsubmit="addRound(event)" class="hidden tone-lime bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-court-600 text-white flex items-center justify-center shrink-0"><span aria-hidden="true">🗓️</span></div>
+                    <div>
+                        <h3 class="text-sm font-bold text-navy-900">Agregar nueva jornada</h3>
+                        <p class="text-xs text-slate-500">Se crea para todos los jugadores con 0 victorias y 0 derrotas, y aparece al instante.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input id="new-round-date" type="date" required class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">➕</span> Agregar jornada</button>
+                </div>
+            </form>
+
+            <div class="tone-sky bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-navy-900 flex items-center gap-2">
                         <span class="text-court-600" aria-hidden="true">✅</span>
@@ -442,21 +467,6 @@
                     </select>
                 </div>
             </div>
-
-            <!-- Agregar nueva jornada (solo editores) -->
-            <form id="round-add-form" data-admin-only onsubmit="addRound(event)" class="hidden bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-court-600 text-white flex items-center justify-center shrink-0"><span aria-hidden="true">🗓️</span></div>
-                    <div>
-                        <h3 class="text-sm font-bold text-navy-900">Agregar nueva jornada</h3>
-                        <p class="text-xs text-slate-500">Se crea para todos los jugadores con 0 victorias y 0 derrotas, y aparece al instante.</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <input id="new-round-date" type="date" required class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-court-700 hover:bg-court-800 text-white text-xs font-bold flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">➕</span> Agregar jornada</button>
-                </div>
-            </form>
 
             <!-- Grilla de Tarjetas por Jornada -->
             <div id="rounds-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -959,7 +969,7 @@
                 }).join('');
 
                 return `
-                    <div class="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden flex flex-col justify-between card-hover">
+                    <div class="${hasActivity ? (diff === 0 ? 'tone-mint' : 'tone-amber') : 'tone-slate'} bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden flex flex-col justify-between card-hover">
                         <div>
                             <div class="px-4 py-3 border-b border-zinc-200 flex items-center justify-between">
                                 <span class="font-bold text-sm text-zinc-900">${escapeHtml(dateLabel)}</span>
@@ -1016,6 +1026,18 @@
 
         function renderRankingTable(stats) {
             const tbody = document.getElementById('ranking-tbody');
+            const roundOrder = sortedRoundIdx();
+            // Mejor día: jornada con más victorias del jugador (en empate, la más antigua)
+            const bestDay = (p) => {
+                let bestIdx = -1, bestW = 0;
+                roundOrder.forEach(di => {
+                    const w = Number(p.wins[di]) || 0;
+                    if (w > bestW) { bestW = w; bestIdx = di; }
+                });
+                return bestIdx < 0
+                    ? '<span class="text-slate-400">—</span>'
+                    : `<div class="font-semibold text-slate-700 text-xs">${escapeHtml(state.dates[bestIdx])}</div><div class="text-[10px] font-bold text-emerald-700">🏆 ${bestW} ${bestW === 1 ? 'victoria' : 'victorias'}</div>`;
+            };
             tbody.innerHTML = stats.rankedPlayers.map((p, index) => {
                 const pos = index + 1;
                 return `
@@ -1028,6 +1050,7 @@
                         <td class="py-3.5 px-4 text-center font-bold text-rose-600">${p.totalLosses}</td>
                         <td class="py-3.5 px-4 text-center font-semibold text-slate-700">${p.winPct.toFixed(1)}%</td>
                         <td class="py-3.5 px-4 text-center font-bold text-navy-900 text-xs">${p.effPct.toFixed(1)}%</td>
+                        <td class="py-3.5 px-4 text-center whitespace-nowrap bg-sky-50/60">${bestDay(p)}</td>
                         <td class="py-3.5 px-4 text-right font-mono text-xs text-slate-500">${p.tieBreakerIndex.toFixed(3)}</td>
                     </tr>
                 `;
