@@ -281,7 +281,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                         <div>
                             <h3 class="text-base font-bold text-zinc-900 flex items-center gap-2"><span class="text-court-600" aria-hidden="true">📈</span> Rendimiento por Jornada</h3>
-                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución de victorias obtenidas por cada jugador a lo largo de las fechas</p>
+                            <p id="chart-subtitle" class="text-xs text-zinc-500">Evolución acumulada de victorias de cada jugador a lo largo de las jornadas</p>
                             <div id="chart-leader" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 text-zinc-700 text-xs font-semibold"></div>
                         </div>
                         <div class="inline-flex rounded-xl bg-zinc-100 p-1 self-start sm:self-auto">
@@ -373,10 +373,9 @@
 
                 <form onsubmit="handleQuickMatchSubmit(event)" class="p-6 space-y-5">
                     <div>
-                        <label for="quick-date" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">1. Selecciona la Jornada / Fecha</label>
-                        <select id="quick-date" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-navy-900 focus:ring-2 focus:ring-court-600 focus:outline-none">
-                            <!-- Opciones dinámicas -->
-                        </select>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">1. Jornada de hoy</label>
+                        <input type="hidden" id="quick-date">
+                        <div id="quick-today" class="rounded-xl border px-4 py-3 text-sm font-semibold flex items-center gap-2"></div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -528,6 +527,61 @@
         let chartMetric = 'wins';
         let dbIsEmpty = false;
         let pendingRoundsRender = false;
+        let dbHasHoles = false;        // la base tiene jornadas borradas a mano (huecos null)
+        let pendingRepair = null;      // cambios para compactar la base
+        let repairInFlight = false;
+
+        // ---- Jornadas: orden cronológico (solo visual; los índices de datos no cambian) ----
+        function parseRoundTs(label) {
+            const m = /(\d{1,2})-([^-\s]{3})-(\d{4})/.exec(String(label));
+            if (!m) return Infinity;
+            const mon = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'].indexOf(m[2]);
+            return mon < 0 ? Infinity : Date.UTC(Number(m[3]), mon, Number(m[1]));
+        }
+        function sortedRoundIdx() {
+            return state.dates.map((d, i) => ({ i, t: parseRoundTs(d) }))
+                .sort((a, b) => (a.t === b.t ? a.i - b.i : (a.t < b.t ? -1 : 1)))
+                .map(o => o.i);
+        }
+
+        // ---- Compactar jornadas: conserva solo los índices de `keep` y reindexa todo ----
+        function buildCompactChanges(keep, srcDates, srcPlayers, srcLogs) {
+            const pick = (arr) => keep.map(i => Number(arr && arr[i]) || 0);
+            const changes = { dates: keep.map(i => srcDates[i]) };
+            srcPlayers.forEach((p, i) => {
+                if (!p) return;
+                changes[`players/${i}/wins`] = pick(p.wins);
+                changes[`players/${i}/losses`] = pick(p.losses);
+            });
+            srcLogs.forEach(l => {
+                if (l.dateIdx === undefined || l.dateIdx === null) return;
+                const ni = keep.indexOf(l.dateIdx);
+                if (ni === -1) changes[`quickLogs/${l.id}`] = null;
+                else if (ni !== l.dateIdx) changes[`quickLogs/${l.id}/dateIdx`] = ni;
+            });
+            return changes;
+        }
+
+        // Repara una sola vez los huecos de la base (solo si hay editor con sesión)
+        function maybeRepair() {
+            if (!pendingRepair || !currentUser || repairInFlight) return;
+            const changes = pendingRepair;
+            pendingRepair = null;
+            repairInFlight = true;
+            dbUpdate(changes, { repair: true }).then(ok => {
+                repairInFlight = false;
+                if (ok) showToast('Jornadas vacías reparadas en la base de datos');
+            });
+        }
+
+        // ---- Jornada de hoy (registro rápido) ----
+        function todayISO() {
+            const n = new Date();
+            return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+        }
+        function getTodayRoundIdx() {
+            return state.dates.indexOf(labelFromISO(todayISO()));
+        }
         const BASE = 'liga_tenis/temporada_2026';
 
         function updateSyncBadge(status, text) {
@@ -568,23 +622,30 @@
                 dbIsEmpty = false;
                 const data = snapshot.val();
                 if (data && Array.isArray(data.players) && Array.isArray(data.dates)) {
-                    // Índices de fechas válidas (descarta huecos null/vacíos)
-const keep = [];
-data.dates.forEach((d, i) => { if (d !== null && d !== undefined && String(d).trim() !== '') keep.push(i); });
-const pick = (arr) => keep.map(i => Number(Array.isArray(arr) ? arr[i] : 0) || 0);
-
-state = {
-    ptsWin: Number(data.ptsWin ?? 2),
-    ptsLoss: Number(data.ptsLoss ?? 1),
-    dates: keep.map(i => data.dates[i]),
-    players: data.players.filter(Boolean).map(p => ({
-        ...p,
-        wins: pick(p.wins),
-        losses: pick(p.losses)
-    })),
-    quickLogs: normalizeQuickLogs(data.quickLogs)
-};
+                    const rawDates = data.dates;
+                    const keep = [];
+                    rawDates.forEach((d, i) => { if (d !== null && d !== undefined && String(d).trim() !== '') keep.push(i); });
+                    const pick = (arr) => keep.map(i => Number(arr && arr[i]) || 0);
+                    state = {
+                        ptsWin: Number(data.ptsWin ?? 2),
+                        ptsLoss: Number(data.ptsLoss ?? 1),
+                        dates: keep.map(i => rawDates[i]),
+                        players: data.players.map(p => ({
+                            ...p,
+                            wins: pick(p.wins),
+                            losses: pick(p.losses)
+                        })),
+                        quickLogs: normalizeQuickLogs(data.quickLogs)
+                    };
+                    dbHasHoles = keep.length !== rawDates.length;
+                    if (dbHasHoles) {
+                        const rawLogs = Object.entries(data.quickLogs || {}).map(([id, v]) => ({ id, dateIdx: v && v.dateIdx }));
+                        pendingRepair = buildCompactChanges(keep, rawDates, data.players, rawLogs);
+                    } else {
+                        pendingRepair = null;
+                    }
                     renderAll();
+                    maybeRepair();
                     saveCache();
                     updateSyncBadge('online', 'Sincronizado en tiempo real');
                 }
@@ -604,15 +665,21 @@ state = {
                 // Las sesiones anónimas antiguas no cuentan como editor
                 currentUser = (user && !user.isAnonymous) ? user : null;
                 applyAuthUI();
+                maybeRepair();
                 if (currentUser && dbIsEmpty) await seedState();
             });
             subscribeToLeagueData();
         }
 
         // Escritura puntual (multi-ruta, atómica). Acepta increment() y null para borrar.
-        async function dbUpdate(changes) {
+        async function dbUpdate(changes, opts = {}) {
             if (!currentUser) {
                 showToast('Inicia sesión para editar.', 'warning');
+                return false;
+            }
+            if (dbHasHoles && !opts.repair) {
+                showToast('Reparando jornadas vacías… intenta de nuevo en un momento.', 'warning');
+                maybeRepair();
                 return false;
             }
             try {
@@ -661,6 +728,7 @@ state = {
             label.classList.toggle('hidden', !logged);
             label.textContent = logged ? currentUser.email : '';
             document.querySelectorAll('[data-admin-only]').forEach(el => el.classList.toggle('hidden', !logged));
+            if (!isEditingRounds()) renderRoundsView();
             applyReadOnly();
         }
 
@@ -772,11 +840,11 @@ state = {
             if (metric === 'wins') {
                 winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition';
                 pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition';
-                subtitle.textContent = 'Evolución de victorias obtenidas por cada jugador a lo largo de las fechas';
+                subtitle.textContent = 'Evolución acumulada de victorias de cada jugador a lo largo de las jornadas';
             } else {
                 pointsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-court-600 shadow-sm transition';
                 winsBtn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 transition';
-                subtitle.textContent = 'Evolución de puntos sumados por cada jugador en cada jornada';
+                subtitle.textContent = 'Evolución acumulada de puntos de cada jugador a lo largo de las jornadas';
             }
             renderChart(computeLeagueStats());
         }
@@ -785,7 +853,13 @@ state = {
             const ctx = document.getElementById('rankingChart');
             if (!ctx) return;
 
-            const labels = state.dates;
+            const order = sortedRoundIdx();
+            let lastPos = 0;
+            order.forEach((di, pos) => {
+                if (state.players.some(p => (Number(p.wins[di]) || 0) + (Number(p.losses[di]) || 0) > 0)) lastPos = pos;
+            });
+            const shownOrder = order.slice(0, lastPos + 1);
+            const labels = shownOrder.map(di => state.dates[di]);
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
             const palette = ['#7fc77f', '#6bb7e6', '#f2a36b', '#a98be0', '#ee8ba6', '#5cc9bd', '#e6b84c', '#9ccc65'];
@@ -796,10 +870,12 @@ state = {
 
             const datasets = state.players.map((p, idx) => {
                 const color = palette[idx % palette.length];
-                const seriesData = state.dates.map((_, dIdx) => {
+                let acc = 0;
+                const seriesData = shownOrder.map(dIdx => {
                     const w = Number(p.wins[dIdx]) || 0;
                     const l = Number(p.losses[dIdx]) || 0;
-                    return chartMetric === 'wins' ? w : (w * ptsWin) + (l * ptsLoss);
+                    acc += chartMetric === 'wins' ? w : (w * ptsWin) + (l * ptsLoss);
+                    return acc;
                 });
                 return {
                     label: p.name,
@@ -813,7 +889,7 @@ state = {
                     pointRadius: 4,
                     pointHoverRadius: 6,
                     fill: false,
-                    tension: 0.35
+                    tension: 0.2
                 };
             });
 
@@ -845,13 +921,15 @@ state = {
             if (!filterSelect || !grid) return;
 
             const currentFilter = filterSelect.value || 'all';
+            const order = sortedRoundIdx();
             filterSelect.innerHTML = `<option value="all">Todas las jornadas (${state.dates.length})</option>` +
-                state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
-            filterSelect.value = currentFilter;
+                order.map(idx => `<option value="${idx}">${escapeHtml(state.dates[idx])}</option>`).join('');
+            const filterOk = currentFilter === 'all' || state.dates[parseInt(currentFilter, 10)] !== undefined;
+            filterSelect.value = filterOk ? currentFilter : 'all';
 
             const ptsWin = Number(state.ptsWin) || 0;
             const ptsLoss = Number(state.ptsLoss) || 0;
-            const indicesToRender = currentFilter === 'all' ? state.dates.map((_, idx) => idx) : [parseInt(currentFilter, 10)];
+            const indicesToRender = (!filterOk || currentFilter === 'all') ? order : [parseInt(currentFilter, 10)];
 
             grid.innerHTML = indicesToRender.map(dIdx => {
                 const dateLabel = state.dates[dIdx];
@@ -885,7 +963,10 @@ state = {
                         <div>
                             <div class="px-4 py-3 border-b border-zinc-200 flex items-center justify-between">
                                 <span class="font-bold text-sm text-zinc-900">${escapeHtml(dateLabel)}</span>
-                                ${statusBadge}
+                                <span class="flex items-center gap-2">
+                                    ${statusBadge}
+                                    ${currentUser ? `<button type="button" onclick="deleteRound(${dIdx})" title="Eliminar jornada" aria-label="Eliminar jornada ${escapeHtml(dateLabel)}" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">🗑️ Eliminar</button>` : ''}
+                                </span>
                             </div>
                             <table class="w-full text-left border-collapse">
                                 <thead><tr class="bg-slate-50 text-[10px] text-slate-500 uppercase"><th class="py-2 px-3">Jugador</th><th class="py-2 px-2 text-center">Vic</th><th class="py-2 px-2 text-center">Der</th><th class="py-2 px-3 text-right">Pts</th></tr></thead>
@@ -954,17 +1035,25 @@ state = {
         }
 
         function renderQuickMatchForm() {
-            const dateSelect = document.getElementById('quick-date');
             const winnerSelect = document.getElementById('quick-winner');
             const loserSelect = document.getElementById('quick-loser');
-            const prev = { date: dateSelect.value, winner: winnerSelect.value, loser: loserSelect.value };
+            const prev = { winner: winnerSelect.value, loser: loserSelect.value };
 
-            dateSelect.innerHTML = state.dates.map((d, idx) => `<option value="${idx}">${escapeHtml(d)}</option>`).join('');
+            // Jornada de hoy (se recalcula en cada render: al agregar/eliminar jornadas se actualiza sola)
+            const todayIdx = getTodayRoundIdx();
+            const todayLabel = labelFromISO(todayISO());
+            document.getElementById('quick-date').value = todayIdx >= 0 ? String(todayIdx) : '';
+            const todayBox = document.getElementById('quick-today');
+            todayBox.className = 'rounded-xl border px-4 py-3 text-sm font-semibold flex items-center gap-2 ' +
+                (todayIdx >= 0 ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-amber-50 border-amber-300 text-amber-800');
+            todayBox.innerHTML = todayIdx >= 0
+                ? `<span aria-hidden="true">✅</span> Hoy es jornada: <strong>${escapeHtml(state.dates[todayIdx])}</strong>`
+                : `<span aria-hidden="true">⚠️</span> Hoy (${escapeHtml(todayLabel)}) no hay jornada registrada`;
+
             const playerOptions = state.players.map((p, idx) => `<option value="${idx}">${escapeHtml(p.name)}</option>`).join('');
             winnerSelect.innerHTML = playerOptions;
             loserSelect.innerHTML = playerOptions;
 
-            if (prev.date !== '' && state.dates[prev.date] !== undefined) dateSelect.value = prev.date;
             if (prev.winner !== '' && state.players[prev.winner]) winnerSelect.value = prev.winner;
             if (prev.loser !== '' && state.players[prev.loser]) loserSelect.value = prev.loser;
             else if (state.players.length > 1) loserSelect.value = '1';
@@ -1015,7 +1104,11 @@ state = {
 
         async function handleQuickMatchSubmit(e) {
             e.preventDefault();
-            const dateIdx = parseInt(document.getElementById('quick-date').value, 10);
+            const dateIdx = getTodayRoundIdx();   // se recalcula al enviar (por si cambió el día)
+            if (dateIdx < 0) {
+                showToast(`Hoy (${labelFromISO(todayISO())}) no coincide con ninguna jornada registrada.`, 'warning', 4500);
+                return;
+            }
             const winnerIdx = parseInt(document.getElementById('quick-winner').value, 10);
             const loserIdx = parseInt(document.getElementById('quick-loser').value, 10);
 
@@ -1041,7 +1134,7 @@ state = {
             state.quickLogs.slice(49).forEach(l => { changes[`quickLogs/${l.id}`] = null; });
 
             const ok = await dbUpdate(changes);
-            if (ok) { showToast('Partido registrado correctamente'); window.track('match_registered', { round: state.dates[dateIdx] }); }
+            if (ok) { showToast(`Partido registrado en ${state.dates[dateIdx]}`); window.track('match_registered', { round: state.dates[dateIdx] }); }
         }
 
         async function undoQuickLog(id) {
@@ -1107,6 +1200,27 @@ state = {
                 showToast(`Jornada ${label} agregada`);
                 window.track('round_added', { round: label });
             }
+        }
+
+        async function deleteRound(idx) {
+            if (!currentUser) { showToast('Inicia sesión para editar.', 'warning'); return; }
+            if (state.dates.length <= 1) {
+                showToast('Debe quedar al menos una jornada.', 'warning');
+                return;
+            }
+            const label = state.dates[idx];
+            if (label === undefined) return;
+            const totW = state.players.reduce((a, p) => a + (Number(p.wins[idx]) || 0), 0);
+            const totL = state.players.reduce((a, p) => a + (Number(p.losses[idx]) || 0), 0);
+            const msg = `¿Eliminar la jornada "${label}"?\n\nSe borrarán ${totW} victorias y ${totL} derrotas registradas en ella ` +
+                `(y sus registros rápidos). El ranking y los gráficos se recalcularán.\n\nEsta acción no se puede deshacer.`;
+            if (!confirm(msg)) return;
+
+            const keep = state.dates.map((_, i) => i).filter(i => i !== idx);
+            const changes = buildCompactChanges(keep, state.dates, state.players, state.quickLogs);
+            document.getElementById('round-filter').value = 'all';   // los índices cambian: volver a "todas"
+            const ok = await dbUpdate(changes);
+            if (ok) { showToast(`Jornada ${label} eliminada`); window.track('round_deleted', { round: label }); }
         }
 
         async function renamePlayer(idx) {
@@ -1213,6 +1327,7 @@ state = {
         window.handleLogin = handleLogin;
         window.doLogout = doLogout;
         window.addRound = addRound;
+        window.deleteRound = deleteRound;
 
         window.addEventListener('DOMContentLoaded', () => {
             const cached = loadCache();
